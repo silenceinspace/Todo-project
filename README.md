@@ -14,7 +14,7 @@ A few parameteres can be set on a task:
 
 1. Title - a few words that help to get a better idea of the task;
 2. Description - additional text that can be used to elaborate on the task;
-3. Duedate - a specific point in time by which the task must be done, aka _deadline_;
+3. Due date - a specific point in time by which the task must be done, aka _deadline_;
 4. Priority - property that reflects on how urgent/important the task is;
 
 The todo app has two different types of state to display tasks - project and temporary views.
@@ -23,7 +23,7 @@ The todo app has two different types of state to display tasks - project and tem
 
 > The temporary view is directly tied with the task's properties. While using that view, the app "sorts" all tasks based on a due date in this case.
 
-#### Projects
+### Projects
 
 A project is a place that refers to all tasks that have the same property on themselves.
 
@@ -46,7 +46,7 @@ _How can the todo accomplish this behavior?_
 **Manipulations with tasks:** (_CRUD principle_)
 
 1. Creation - task is created based on a common template;
-2. Reading - task be retrived and grouped with other similar tasks;
+2. Reading - task can be retrived and grouped with other similar tasks;
 3. Update - task can be edited, i.e. a changed title;
 4. Deletion - task can be removed from an app's storage due to two reasons: completing or early removal;
 
@@ -67,7 +67,7 @@ _How can the todo accomplish this behavior?_
 
 Questions to ask myself at the beginning of a project:
 
-1. What parts make up my project? And how can I encapsulate them so that they don't interfere with other other?
+1. What parts make up my project? And how can I encapsulate them so that they don't interfere with each other?
 2. How do these components communicate with each other?
 3. How can I make these parts reusable - create as I need them?
 
@@ -93,3 +93,26 @@ Questions to ask myself at the beginning of a project:
     - due date;
     - priority;
     - project;
+
+**Identifying first essential steps**
+
+1. Plan out the structure of my code
+- how many modules will I have?
+- what will each module be responsible for?
+- how will modules communicate with each other?
+
+2. Task creation
+- should I use classes or factories?
+- what properties will tasks have?
+- where will I store tasks?
+
+3. Operations with tasks
+- how can I retrieve a specific task from the storage?
+- how will I know that a task belongs to a particular project?
+- what info can I edit on tasks? and how will they be updated then?
+- how I should "mark" tasks to remove the needed ones easier?
+
+4. Project management
+- how can I create a custom project?
+- how will all tasks get access (can be tied with) to new projects?
+- should I have a project "manager" that will watch and be able to modify all projects?
