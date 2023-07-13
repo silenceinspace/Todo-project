@@ -10,6 +10,7 @@
   display: grid;
   grid-template-columns: 120px 300px;
   grid-template-rows: 120px minmax(300px, 1fr);
+  background-color: darkcyan;
 
   & button:hover {
     text-decoration: underline;
@@ -32,7 +33,7 @@
     font-size: 1.2rem;
     font-weight: bold;
 
-    background-color: grey;
+    background-color: white;
     color: orange;
     border: none;
   }
@@ -43,6 +44,7 @@
   grid-row: 2/3;
   margin-top: 10px;
 
+  width: 120px;
   display: grid;
   grid-auto-rows: 30px;
   gap: 10px;
@@ -52,10 +54,24 @@
   & button {
     font-size: 1.2rem;
     font-weight: bold;
+    text-align: center;
 
-    background-color: darkolivegreen;
+    background-color: coral;
     color: skyblue;
     border: none;
+    position: relative;
+
+    /* & .rmv-project {
+      position: absolute;
+      right: 0;
+      top: 0;
+
+      padding: 0 5px;
+      height: 30px;
+      background-color: black;
+      font-size: 1.5rem;
+      color: white;
+    } */
   }
 }
 
@@ -66,7 +82,7 @@
   border: purple solid 2px;
 
   & > button {
-    background-color: green;
+    background-color: coral;
     font-size: 1.2rem;
     font-weight: bold;
     color: white;
@@ -87,6 +103,21 @@
       font-size: 1.3rem;
       font-style: italic;
       border-bottom: 2px solid black;
+      position: relative;
+
+      & .rmv-task {
+        padding: 5px 8px;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+
+        color: white;
+        font-size: 1.2rem;
+        font-weight: bold;
+        background-color: red;
+        border: none;
+        border-radius: 5px;
+      }
     }
   }
 }

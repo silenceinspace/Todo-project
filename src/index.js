@@ -45,7 +45,7 @@ console.log(mainStorage);
 createTasksBtn.addEventListener("click", createTodo);
 function createTodo() {
   let project = prompt("Project?", "");
-  // Default project
+  // Default project - if projectStorage.length == 0 ---> means that no custom projects yet
   if (project === "") {
     project = "inbox";
   }
@@ -75,12 +75,15 @@ function displayTasksInProject(e) {
   displayForTasks.replaceChildren();
 
   for (let i = 0; i < currentProject.length; i++) {
+    const taskField = createElement("div", "task-field", "");
+    taskField.setAttribute("data-id", currentProject[i].id);
+    const removeTask = createElement("button", "rmv-task", "X");
     const titlePara = currentProject[i].todoTitle;
     const projectPara = currentProject[i].todoProject;
     const priorityPara = currentProject[i].todoPriority;
 
-    const taskField = createElement("div", "task-field", "");
     appendElement(displayForTasks, taskField);
+    appendElement(taskField, removeTask);
 
     for (let j = 0; j < 3; j++) {
       let para;
@@ -103,6 +106,21 @@ function displayTasksInProject(e) {
   }
 }
 
+// Remove a task
+displayForTasks.addEventListener("click", removeTask);
+
+function removeTask(e) {
+  const btn = e.target.closest("button");
+  if (!btn) return;
+
+  const specificTask = e.target.closest("[data-id]");
+  const id = specificTask.getAttribute("data-id");
+
+  specificTask.remove();
+  mainStorage = taskInterface.remove(id);
+  console.log(mainStorage);
+}
+
 // Create a project
 // Store projects
 let projectStorage = [];
@@ -117,7 +135,33 @@ function createProject() {
   const project = new Project(title);
   projectStorage = projectInterface.add(project);
 
-  const btn = createElement("button", "custom-project-button", title);
+  const btn = createElement("button", "custom-project-div", title);
+  // const span = createElement("span", "rmv-project", "X");
+  // appendElement(btn, span);
 
   appendElement(projectBlock, btn);
+}
+
+// Remove a project
+
+// projectBlock.addEventListener("dblclick", removeroject);
+
+function removeProject(e) {
+  const btn = e.target.closest("button");
+  if (!btn) return;
+
+  const project = e.target.textContent;
+  const warning = confirm("remove this project with all tasks related to it?");
+  if (warning) {
+    // Clear array in an object from which I take all info and assign to mainStorage
+    taskInterface.todos = projectInterface.removeAssociatedTasks(
+      project,
+      taskInterface.todos
+    );
+    mainStorage = taskInterface.todos;
+
+    projectStorage = projectInterface.remove(project);
+    btn.remove();
+    displayForTasks.replaceChildren();
+  }
 }

@@ -43,19 +43,9 @@ const taskInterface = {
     return this.todos;
   },
 
-  remove(elem) {
-    const identifier = elem.id;
-
-    this.todos = this.todos.filter((task) => task.id !== identifier);
+  remove(value) {
+    this.todos = this.todos.filter((task) => task.id !== value);
     return this.todos;
-  },
-
-  // Display all details of a found element
-  // Should I fetch an element by index?
-  find(index) {
-    const elem = this.todos[index];
-    console.log(`Find task: "${elem.todoTitle}" title`);
-    return elem;
   },
 
   findAll(proj) {

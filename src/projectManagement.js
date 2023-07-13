@@ -22,22 +22,16 @@ const projectInterface = {
     return this.projects;
   },
 
-  remove(elem) {
-    const specificProject = elem.titleOfProject;
-
+  remove(value) {
     this.projects = this.projects.filter(
-      (proj) => proj.titleOfProject !== specificProject
+      (proj) => proj.titleOfProject !== value
     );
-    console.log(`Remove project: "${specificProject}" title`);
 
     return this.projects;
   },
 
   removeAssociatedTasks(proj, storage) {
-    const relatedTasks = proj.titleOfProject;
-    storage = storage.filter((task) => task.todoProject !== relatedTasks);
-
-    console.log(`All tasks related to "${relatedTasks}" project were removed`);
+    storage = storage.filter((task) => task.todoProject !== proj);
 
     return storage;
   },
