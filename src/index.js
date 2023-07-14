@@ -58,7 +58,7 @@ function createTodo() {
 }
 
 // Display all todos in a project
-defaultBlock.addEventListener("click", displayTasksInProject);
+inboxBtn.addEventListener("click", displayTasksInProject);
 projectBlock.addEventListener("click", displayTasksInProject);
 
 function displayTasksInProject(e) {
@@ -135,22 +135,24 @@ function createProject() {
   const project = new Project(title);
   projectStorage = projectInterface.add(project);
 
+  const div = createElement("div", "project-title-div", "");
   const btn = createElement("button", "custom-project-div", title);
-  // const span = createElement("span", "rmv-project", "X");
-  // appendElement(btn, span);
+  const span = createElement("span", "rmv-project", "X");
 
-  appendElement(projectBlock, btn);
+  appendElement(div, btn);
+  appendElement(div, span);
+  appendElement(projectBlock, div);
 }
 
 // Remove a project
 
-// projectBlock.addEventListener("dblclick", removeroject);
+projectBlock.addEventListener("click", removeProject);
 
 function removeProject(e) {
-  const btn = e.target.closest("button");
-  if (!btn) return;
+  const span = e.target.closest("span");
+  if (!span) return;
 
-  const project = e.target.textContent;
+  const project = span.previousElementSibling.textContent;
   const warning = confirm("remove this project with all tasks related to it?");
   if (warning) {
     // Clear array in an object from which I take all info and assign to mainStorage
@@ -161,7 +163,7 @@ function removeProject(e) {
     mainStorage = taskInterface.todos;
 
     projectStorage = projectInterface.remove(project);
-    btn.remove();
+    span.parentNode.remove();
     displayForTasks.replaceChildren();
   }
 }

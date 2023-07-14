@@ -58,20 +58,20 @@ const taskInterface = {
     return arr;
   },
 
-  update(elem, property, value) {
-    if (property.toLowerCase() === "title") {
-      console.log(`Old title: ${elem.todoTitle}`);
-      elem.todoTitle = value;
-      console.log(`Updated title: ${value}`);
-    } else if (property.toLowerCase() === "priority") {
-      console.log(`Old title: ${elem.todoPriority}`);
-      elem.todoPriority = value;
-      console.log(`Updated priority: ${value}`);
-    } else if (property.toLowerCase() === "project") {
-      console.log(`Old title: ${elem.todoProject}`);
-      elem.todoProject = value;
-      console.log(`Updated property: ${value}`);
-    }
-    console.log(`Full details: "${elem.title}" title`);
-  },
+  // update(elem, property, value) {
+  //   if (property.toLowerCase() === "title") {
+  //     console.log(`Old title: ${elem.todoTitle}`);
+  //     elem.todoTitle = value;
+  //     console.log(`Updated title: ${value}`);
+  //   } else if (property.toLowerCase() === "priority") {
+  //     console.log(`Old title: ${elem.todoPriority}`);
+  //     elem.todoPriority = value;
+  //     console.log(`Updated priority: ${value}`);
+  //   } else if (property.toLowerCase() === "project") {
+  //     console.log(`Old title: ${elem.todoProject}`);
+  //     elem.todoProject = value;
+  //     console.log(`Updated property: ${value}`);
+  //   }
+  //   console.log(`Full details: "${elem.title}" title`);
+  // },
 };
