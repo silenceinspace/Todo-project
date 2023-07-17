@@ -1,7 +1,6 @@
 import { Todo, taskInterface } from "./todosManipulations";
 import { Project, projectInterface } from "./projectManagement";
-
-import { createElement, appendElement, prependElement } from "./sectionWithDom";
+import { createElement, appendElement } from "./sectionWithDom";
 import "./styles.css";
 
 // Create the main layout
@@ -38,6 +37,7 @@ appendElement(todoBlock, createTaskButton);
 appendElement(todoBlock, createProjectButton);
 appendElement(todoBlock, displayForTasks);
 
+// Section containing program logic
 // Main array where tasks are stored
 let mainStorage = [];
 console.log("Main storage:");
@@ -47,7 +47,8 @@ let projectStorage = [];
 console.log("Project storage:");
 console.log(projectStorage);
 
-// Create a todo directly in a task
+// Task creation:
+// 1) Create a todo directly in a task
 const createTaskInsideProject = createElement(
   "button",
   "create-task-directly",
@@ -56,8 +57,9 @@ const createTaskInsideProject = createElement(
 appendElement(todoBlock, createTaskInsideProject);
 createTaskInsideProject.addEventListener("click", createTodo);
 
-// Create a todo globally - project name is required!!!
+// 2) Create a todo globally - project name is required!!!
 createTaskButton.addEventListener("click", createTodo);
+
 function createTodo(e) {
   // Create a task locally inside the chosen task
   const directCreation = e.target.closest(".create-task-directly");
@@ -121,12 +123,15 @@ function generateListOfTasks(project) {
     const taskDiv = createElement("div", "task-div", "");
     taskDiv.setAttribute("data-id", currentProject[i].id);
     const removeButton = createElement("button", "remove-task", "X");
+    const checkList = createElement("input", "check-box", "");
+    checkList.setAttribute("type", "checkbox");
     const titlePara = currentProject[i].todoTitle;
     const projectPara = currentProject[i].todoProject;
     const priorityPara = currentProject[i].todoPriority;
 
     appendElement(displayForTasks, taskDiv);
     appendElement(taskDiv, removeButton);
+    appendElement(taskDiv, checkList);
 
     for (let j = 0; j < 3; j++) {
       let para;
@@ -146,6 +151,18 @@ function generateListOfTasks(project) {
       }
       appendElement(taskDiv, para);
     }
+
+    // Highlight priority levels differently
+    if (priorityPara === "1") {
+      checkList.style.border = "3px solid red";
+      checkList.style.backgroundColor = "rgb(214, 111, 111)";
+    } else if (priorityPara === "2") {
+      checkList.style.border = "3px solid yellow";
+      checkList.style.backgroundColor = "rgb(173, 173, 79)";
+    } else if (priorityPara === "3") {
+      checkList.style.border = "3px solid blue";
+      checkList.style.backgroundColor = "rgb(117, 117, 199)";
+    }
   }
 }
 
@@ -164,6 +181,27 @@ function removeTask(e) {
   console.log(mainStorage);
 }
 
+// Complete a task
+displayForTasks.addEventListener("change", completeTask);
+
+function completeTask(e) {
+  let taskStatus = e.target.checked;
+  if (taskStatus === true) {
+    const strikeThroughPara = e.target.parentNode.querySelectorAll("p");
+    strikeThroughPara.forEach(
+      (para) => (para.style.textDecoration = "line-through")
+    );
+    e.target.disabled = true;
+
+    const specificTask = e.target.closest("[data-id]");
+    const id = specificTask.getAttribute("data-id");
+    setTimeout(() => {
+      specificTask.remove();
+      mainStorage = taskInterface.remove(id);
+      console.log(mainStorage);
+    }, 300);
+  }
+}
 // Create a project
 createProjectButton.addEventListener("click", createProject);
 function createProject() {
@@ -181,6 +219,11 @@ function createProject() {
   appendElement(div, btn);
   appendElement(div, span);
   appendElement(projectBlock, div);
+
+  let disabledButtons = document.querySelectorAll("button.project");
+  disabledButtons.forEach((btn) => (btn.disabled = false));
+  btn.disabled = true;
+  updateTaskDisplay();
 }
 
 // Remove a project
@@ -198,11 +241,11 @@ function removeProject(e) {
       taskInterface.todos
     );
     mainStorage = taskInterface.todos;
-
     projectStorage = projectInterface.remove(project);
     span.parentNode.remove();
-    displayForTasks.replaceChildren();
 
+    // While removing an element from DOM and needing to rerender content, it will automatically go back to inbox project
+    displayForTasks.replaceChildren();
     inbox.disabled = true;
     updateTaskDisplay();
   }
