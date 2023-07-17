@@ -1,7 +1,12 @@
 import { Todo, taskInterface } from "./todosManipulations";
 import { Project, projectInterface } from "./projectManagement";
 import { createElement, appendElement } from "./sectionWithDom";
-import "./styles.css";
+
+// Similar sections with styles are grouped different files
+import "./main.css";
+import "./inbox-block.css";
+import "./project-block.css";
+import "./todo-block.css";
 
 // Create the main layout
 const content = document.querySelector("#content");

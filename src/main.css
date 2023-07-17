@@ -1,0 +1,29 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#content {
+  width: 420px;
+  display: grid;
+  grid-template-columns: 120px 300px;
+  grid-template-rows: 120px minmax(300px, 1fr);
+  background-color: darkcyan;
+
+  & button:hover {
+    text-decoration: underline;
+    cursor: pointer;
+    color: red;
+  }
+
+  & button:disabled {
+    background-color: black;
+    color: grey;
+  }
+
+  & button:disabled:hover {
+    cursor: default;
+    text-decoration: none;
+  }
+}
