@@ -3,10 +3,11 @@ import { Project } from "./projectManagement";
 
 class Todo extends Project {
   // Creates a todo
-  constructor(projectTitle, title, priority) {
+  constructor(projectTitle, title, dueDate, priority) {
     // Base class is Project that has a project property on its constructor
     super(projectTitle);
     this.title = title;
+    this.dueDate = dueDate;
     this.priority = priority;
     this.id = self.crypto.randomUUID();
   }
@@ -24,6 +25,14 @@ class Todo extends Project {
   }
   set todoTitle(value) {
     this.title = value;
+  }
+
+  get todoDueDate() {
+    return this.dueDate;
+  }
+
+  set todoDueDate(value) {
+    this.dueDate = value;
   }
 
   get todoPriority() {
