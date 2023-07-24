@@ -1,22 +1,11 @@
 import { Todo, taskInterface } from "./todosManipulations";
 import { Project, projectInterface } from "./projectManagement";
 // Import methods
-import {
-  displayNewProject,
-  findClick,
-  findChosenProject,
-  createEventListener,
-  grabTitleOfActiveProject,
-  removePreviousTasksFromDOM,
-  createBlocksToRepresentTasks,
-  highlightProject,
-  findClosestDataAttibute,
-  getIdOfSpecificTask,
-} from "./sectionWithDom";
+import * as DOMMethods from "./sectionWithDom";
 // Import variables
 import {
   projectBlock,
-  inbox,
+  inboxBlock,
   createTaskButton,
   createProjectButton,
   displayForTasks,
@@ -39,7 +28,8 @@ console.log(projectStorage);
 // Get input from a user
 function getInputForTaskProject() {
   let project;
-  if (checkForCustomProjects()) {
+  let customProjectExists = checkForCustomProjects();
+  if (customProjectExists) {
     project = "inbox";
   } else {
     project = prompt("Project?", "");
@@ -63,7 +53,20 @@ function getInputForTaskTitle() {
 }
 
 function getInputForTaskDueDate() {
-  const dueDate = prompt("Due date?", "");
+  // Fow now hardcore data objects to compare dates. But eventually get 3 numbers from date input and put them into new Date(num1, num2, num3)
+  let dueDate = prompt("Due date?", "");
+  if (dueDate === "1") {
+    dueDate = new Date();
+  } else if (dueDate === "2") {
+    dueDate = new Date(2018, 11, 24);
+  } else if (dueDate === "3") {
+    dueDate = new Date(2028, 11, 24);
+  } else if (dueDate === "4") {
+    dueDate = new Date(2023, 7, 2);
+  } else if (dueDate === "5") {
+    dueDate = new Date(2023, 6, 28);
+  }
+
   return dueDate;
 }
 
@@ -72,16 +75,29 @@ function getInputForTaskPriority() {
   return priority;
 }
 
+function limitTasksOnDateCategories() {
+  const currentCategory = DOMMethods.findChosenProject();
+  if (currentCategory === "today" || currentCategory === "upcoming") {
+    alert("You can't manipulate with tasks inside the category");
+    return true;
+  }
+}
+
 // 1) Create a todo directly in a task
 // 2) Create a todo globally - project name is required
-createEventListener(createTaskInsideProject, "click", createTodo);
-createEventListener(createTaskButton, "click", createTodo);
+DOMMethods.createEventListener(createTaskInsideProject, "click", createTodo);
+DOMMethods.createEventListener(createTaskButton, "click", createTodo);
 function createTodo(e) {
   let project;
-  const createdDirectlyOnProject = findClick(e, ".create-task-directly");
+  const createdDirectlyOnProject = DOMMethods.findClick(
+    e,
+    ".create-task-directly"
+  );
+
   if (createdDirectlyOnProject) {
-    const activeProject = findChosenProject();
-    project = activeProject;
+    // Not allowing to create tasks in these categories
+    if (limitTasksOnDateCategories()) return;
+    project = DOMMethods.findChosenProject();
   } else {
     project = getInputForTaskProject();
   }
@@ -92,42 +108,34 @@ function createTodo(e) {
   const task = new Todo(project, title, dueDate, priority);
   mainStorage = taskInterface.add(task);
   console.log(mainStorage);
-  updateTodoDisplay();
+  // Dynamically render newly created tasks
+  DOMMethods.updateTodoDisplay();
 }
 
-// Display all todos in a project
-createEventListener(inbox, "click", displayTasksInThisProject);
-createEventListener(projectBlock, "click", displayTasksInThisProject);
-function generateListOfTasks(project) {
-  const currentProject = taskInterface.findAll(project);
-  // Clear the todo block not to duplicate appended elements
-  removePreviousTasksFromDOM();
-  createBlocksToRepresentTasks(currentProject);
-}
+// Display all todos in a project/date category
+DOMMethods.createEventListener(
+  projectBlock,
+  "click",
+  DOMMethods.displayTasksInThisProject
+);
 
-function displayTasksInThisProject(e) {
-  // Click occurs on the inside of a button
-  const btn = findClick(e, "button");
-  if (!btn) return;
-
-  const title = grabTitleOfActiveProject(e);
-  highlightProject(title);
-  generateListOfTasks(title);
-}
-
-function updateTodoDisplay() {
-  const projectTitle = findChosenProject();
-  generateListOfTasks(projectTitle);
-}
+DOMMethods.createEventListener(
+  inboxBlock,
+  "click",
+  DOMMethods.displayTasksInThisProject
+);
 
 // Remove a task
-createEventListener(displayForTasks, "click", removeTask);
+DOMMethods.createEventListener(displayForTasks, "click", removeTask);
 function removeTask(e) {
-  const btn = findClick(e, "button");
+  const btn = DOMMethods.findClick(e, "button");
   if (!btn) return;
 
-  const task = findClosestDataAttibute(e);
-  const id = getIdOfSpecificTask(task);
+  // Not allow removing tasks in today/upcoming categories
+  if (limitTasksOnDateCategories()) return;
+
+  const task = DOMMethods.findClosestDataAttibute(e);
+  const id = DOMMethods.getIdOfSpecificTask(task);
 
   task.remove();
   mainStorage = taskInterface.remove(id);
@@ -135,21 +143,6 @@ function removeTask(e) {
 }
 
 // Complete a task
-function checkTaskStatus(e) {
-  const task = e.target.checked;
-  return task;
-}
-
-function selectAllParagraphs(e) {
-  const parargraphs = e.target.parentNode.querySelectorAll("p");
-  return parargraphs;
-}
-
-function applyStrikeThroughEffect(e) {
-  const paragraphs = selectAllParagraphs(e);
-  paragraphs.forEach((para) => (para.style.textDecoration = "line-through"));
-}
-
 function slowDownTaskRemoval(taskPara, idPara) {
   setTimeout(() => {
     taskPara.remove();
@@ -158,19 +151,18 @@ function slowDownTaskRemoval(taskPara, idPara) {
   }, 300);
 }
 
-function preventUncheckingTask(e) {
-  e.target.disabled = true;
-}
-
-createEventListener(displayForTasks, "change", completeTask);
+DOMMethods.createEventListener(displayForTasks, "change", completeTask);
 function completeTask(e) {
-  const taskStatus = checkTaskStatus(e);
-  if (taskStatus) {
-    applyStrikeThroughEffect(e);
-    preventUncheckingTask(e);
+  // Not allow completing tasks in today/upcoming categories
+  if (limitTasksOnDateCategories()) return;
 
-    const task = findClosestDataAttibute(e);
-    const id = getIdOfSpecificTask(task);
+  const taskStatus = DOMMethods.checkTaskStatus(e);
+  if (taskStatus) {
+    DOMMethods.applyStrikeThroughEffect(e);
+    DOMMethods.preventUncheckingTask(e);
+
+    const task = DOMMethods.findClosestDataAttibute(e);
+    const id = DOMMethods.getIdOfSpecificTask(task);
     slowDownTaskRemoval(task, id);
   }
 }
@@ -181,22 +173,18 @@ function getInputForNewProject() {
   return title;
 }
 
-createEventListener(createProjectButton, "click", createProject);
+DOMMethods.createEventListener(createProjectButton, "click", createProject);
 function createProject() {
   const title = getInputForNewProject();
   const project = new Project(title);
   projectStorage = projectInterface.add(project);
-  displayNewProject(title);
-  highlightProject(title);
-  updateTodoDisplay();
+  DOMMethods.displayNewProject(title);
+  DOMMethods.highlightProject(title);
+  DOMMethods.updateTodoDisplay();
+  console.log(projectStorage);
 }
 
 // Remove a project
-function getSiblingElementText(element) {
-  const title = element.previousElementSibling.textContent;
-  return title;
-}
-
 function confirmChoice() {
   const warning = confirm("remove this project with all tasks related to it?");
   return warning;
@@ -210,24 +198,22 @@ function changeArraysInMethodObjects(proj) {
   mainStorage = taskInterface.todos;
 }
 
-function removeProjectBtn(element) {
-  element.parentNode.remove();
-}
-
-createEventListener(projectBlock, "click", removeProject);
+DOMMethods.createEventListener(projectBlock, "click", removeProject);
 function removeProject(e) {
-  const span = findClick(e, "span");
+  const span = DOMMethods.findClick(e, "span");
   if (!span) return;
 
-  const project = getSiblingElementText(span);
+  const project = DOMMethods.getSiblingElementText(span);
   const answer = confirmChoice();
   if (answer) {
     changeArraysInMethodObjects(project);
     projectStorage = projectInterface.remove(project);
-    removeProjectBtn(span);
+    DOMMethods.removeProjectBtn(span);
     // While removing an element from DOM and needing to rerender content, it will automatically go back to inbox project
-    removePreviousTasksFromDOM();
-    highlightProject();
-    updateTodoDisplay();
+    DOMMethods.removePreviousTasksFromDOM();
+    DOMMethods.highlightProject();
+    DOMMethods.updateTodoDisplay();
+    console.log(projectStorage);
+    console.log(mainStorage);
   }
 }

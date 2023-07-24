@@ -1,5 +1,8 @@
 export { Todo, taskInterface };
 import { Project } from "./projectManagement";
+// Library to work with dates easier
+import { format, compareAsc } from "date-fns";
+import addDays from "date-fns/addDays";
 
 class Todo extends Project {
   // Creates a todo
@@ -59,11 +62,46 @@ const taskInterface = {
 
   findAll(proj) {
     const arr = [];
-    for (let i = 0; i < this.todos.length; i++) {
-      if (this.todos[i].projectTitle.toLowerCase() === proj.toLowerCase()) {
-        arr.push(this.todos[i]);
+    this.todos.forEach((todo) => {
+      if (todo.todoProject.toLowerCase() === proj.toLowerCase()) {
+        arr.push(todo);
       }
-    }
+    });
+    return arr;
+  },
+
+  findDueToday() {
+    const arr = [];
+    const todayDate = format(new Date(), "MM/dd/yyyy");
+
+    this.todos.forEach((todo) => {
+      if (format(todo.todoDueDate, "MM/dd/yyyy") === todayDate) {
+        arr.push(todo);
+      }
+    });
+    return arr;
+  },
+
+  findDueUpcoming() {
+    const arr = [];
+    // Find out if a task's due date lays in between today and next seven days due
+    this.todos.forEach((todo) => {
+      const todayDate = new Date();
+      const nextSevenDays = addDays(todayDate, 7);
+      const currentTodoDate = todo.todoDueDate;
+
+      const dates = [];
+      dates.push(nextSevenDays, todayDate, currentTodoDate);
+
+      const result = dates.sort(compareAsc);
+      console.log(result);
+      if (
+        format(result[1], "MM/dd/yyyy") ===
+        format(currentTodoDate, "MM/dd/yyyy")
+      ) {
+        arr.push(todo);
+      }
+    });
     return arr;
   },
 
