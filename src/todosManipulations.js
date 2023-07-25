@@ -1,7 +1,7 @@
 export { Todo, taskInterface };
 import { Project } from "./projectManagement";
 // Library to work with dates easier
-import { format, compareAsc } from "date-fns";
+import { compareAsc, format } from "date-fns";
 import addDays from "date-fns/addDays";
 
 class Todo extends Project {
@@ -75,7 +75,8 @@ const taskInterface = {
     const todayDate = format(new Date(), "MM/dd/yyyy");
 
     this.todos.forEach((todo) => {
-      if (format(todo.todoDueDate, "MM/dd/yyyy") === todayDate) {
+      const formatttedDate = format(todo.todoDueDate, "MM/dd/yyyy");
+      if (formatttedDate === todayDate) {
         arr.push(todo);
       }
     });
@@ -84,13 +85,12 @@ const taskInterface = {
 
   findDueUpcoming() {
     const arr = [];
-    // Find out if a task's due date lays in between today and next seven days due
+    // Find out if the task's due date lays in between today and next seven days
     this.todos.forEach((todo) => {
+      const dates = [];
       const todayDate = new Date();
       const nextSevenDays = addDays(todayDate, 7);
       const currentTodoDate = todo.todoDueDate;
-
-      const dates = [];
       dates.push(nextSevenDays, todayDate, currentTodoDate);
 
       const result = dates.sort(compareAsc);

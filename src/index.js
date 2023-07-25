@@ -11,7 +11,7 @@ import {
   displayForTasks,
   createTaskInsideProject,
 } from "./sectionWithDom";
-// Similar sections with styles are grouped different files
+
 import "./main.css";
 import "./inbox-block.css";
 import "./project-block.css";
@@ -25,10 +25,15 @@ let projectStorage = [];
 console.log("Project storage:");
 console.log(projectStorage);
 
+// 1) Create a todo directly in a task
+// 2) Create a todo globally - project name is required
+DOMMethods.createEventListener(createTaskInsideProject, "click", createTodo);
+DOMMethods.createEventListener(createTaskButton, "click", createTodo);
+
 // Get input from a user
 function getInputForTaskProject() {
   let project;
-  let customProjectExists = checkForCustomProjects();
+  const customProjectExists = checkForCustomProjects();
   if (customProjectExists) {
     project = "inbox";
   } else {
@@ -66,7 +71,6 @@ function getInputForTaskDueDate() {
   } else if (dueDate === "5") {
     dueDate = new Date(2023, 6, 28);
   }
-
   return dueDate;
 }
 
@@ -83,20 +87,17 @@ function limitTasksOnDateCategories() {
   }
 }
 
-// 1) Create a todo directly in a task
-// 2) Create a todo globally - project name is required
-DOMMethods.createEventListener(createTaskInsideProject, "click", createTodo);
-DOMMethods.createEventListener(createTaskButton, "click", createTodo);
 function createTodo(e) {
   let project;
   const createdDirectlyOnProject = DOMMethods.findClick(
     e,
     ".create-task-directly"
   );
+  const disableManipulation = limitTasksOnDateCategories();
 
   if (createdDirectlyOnProject) {
     // Not allowing to create tasks in these categories
-    if (limitTasksOnDateCategories()) return;
+    if (disableManipulation) return;
     project = DOMMethods.findChosenProject();
   } else {
     project = getInputForTaskProject();
@@ -132,7 +133,8 @@ function removeTask(e) {
   if (!btn) return;
 
   // Not allow removing tasks in today/upcoming categories
-  if (limitTasksOnDateCategories()) return;
+  const disableManipulation = limitTasksOnDateCategories();
+  if (disableManipulation) return;
 
   const task = DOMMethods.findClosestDataAttibute(e);
   const id = DOMMethods.getIdOfSpecificTask(task);
@@ -143,7 +145,9 @@ function removeTask(e) {
 }
 
 // Complete a task
-function slowDownTaskRemoval(taskPara, idPara) {
+DOMMethods.createEventListener(displayForTasks, "change", completeTask);
+
+function slowDownTaskCompleting(taskPara, idPara) {
   setTimeout(() => {
     taskPara.remove();
     mainStorage = taskInterface.remove(idPara);
@@ -151,7 +155,6 @@ function slowDownTaskRemoval(taskPara, idPara) {
   }, 300);
 }
 
-DOMMethods.createEventListener(displayForTasks, "change", completeTask);
 function completeTask(e) {
   // Not allow completing tasks in today/upcoming categories
   if (limitTasksOnDateCategories()) return;
@@ -163,17 +166,17 @@ function completeTask(e) {
 
     const task = DOMMethods.findClosestDataAttibute(e);
     const id = DOMMethods.getIdOfSpecificTask(task);
-    slowDownTaskRemoval(task, id);
+    slowDownTaskCompleting(task, id);
   }
 }
 
 // Create a project
+DOMMethods.createEventListener(createProjectButton, "click", createProject);
 function getInputForNewProject() {
   const title = prompt("Project name?", "");
   return title;
 }
 
-DOMMethods.createEventListener(createProjectButton, "click", createProject);
 function createProject() {
   const title = getInputForNewProject();
   const project = new Project(title);
@@ -185,6 +188,8 @@ function createProject() {
 }
 
 // Remove a project
+DOMMethods.createEventListener(projectBlock, "click", removeProject);
+
 function confirmChoice() {
   const warning = confirm("remove this project with all tasks related to it?");
   return warning;
@@ -198,7 +203,6 @@ function changeArraysInMethodObjects(proj) {
   mainStorage = taskInterface.todos;
 }
 
-DOMMethods.createEventListener(projectBlock, "click", removeProject);
 function removeProject(e) {
   const span = DOMMethods.findClick(e, "span");
   if (!span) return;

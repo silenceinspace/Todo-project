@@ -1,8 +1,4 @@
 import { taskInterface } from "./todosManipulations";
-
-// Library to format dates
-// import { format } from "date-fns";
-// import addDays from "date-fns/addDays";
 // Export functions
 export {
   findClick,
@@ -21,7 +17,6 @@ export {
   getSiblingElementText,
   removeProjectBtn,
 };
-
 // Export variables
 export {
   projectBlock,
@@ -38,7 +33,6 @@ function createDOMElement(name, className, text) {
   let elem = document.createElement(name);
   elem.classList.add(className);
   elem.textContent = text;
-
   return elem;
 }
 
@@ -111,6 +105,11 @@ function setColorOnChecklist(priorityLevel, element) {
   }
 }
 
+function selectAllParagraphs(e) {
+  const parargraphs = e.target.parentNode.querySelectorAll("p");
+  return parargraphs;
+}
+
 function generateListOfTasks(project) {
   // Clear the todo block not to duplicate appended elements
   removePreviousTasksFromDOM();
@@ -130,15 +129,11 @@ function generateListOfTasks(project) {
   createBlocksToRepresentTasks(currentProject);
 }
 
-function selectAllParagraphs(e) {
-  const parargraphs = e.target.parentNode.querySelectorAll("p");
-  return parargraphs;
-}
-
 function grabTitleOfActiveProject(e) {
   const title = e.target.textContent;
   return title;
 }
+
 ///////////////////////
 // Exported functions
 function findClick(e, value) {
