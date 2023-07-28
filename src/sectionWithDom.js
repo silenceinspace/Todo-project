@@ -16,6 +16,9 @@ export {
   getIdOfSpecificTask,
   getSiblingElementText,
   removeProjectBtn,
+  openPopupFromProject,
+  openPopup,
+  closePopup,
 };
 // Export variables
 export {
@@ -25,6 +28,7 @@ export {
   createProjectButton,
   displayForTasks,
   createTaskInsideProject,
+  createTodoForm,
 };
 
 //////////////////////
@@ -48,6 +52,7 @@ function createBlocksToRepresentTasks(project) {
     const checkList = createDOMElement("input", "check-box", "");
     checkList.setAttribute("type", "checkbox");
     const titlePara = project[i].todoTitle;
+    const descriptionPara = project[i].todoDescription;
     const projectPara = project[i].todoProject;
     const priorityPara = project[i].todoPriority;
     const dueDatePara = project[i].todoDueDate;
@@ -60,6 +65,7 @@ function createBlocksToRepresentTasks(project) {
 
     createTextFields(
       titlePara,
+      descriptionPara,
       projectPara,
       priorityPara,
       dueDatePara,
@@ -68,8 +74,13 @@ function createBlocksToRepresentTasks(project) {
   }
 }
 
-function createTextFields(title, project, dueDate, priority, div) {
+function createTextFields(title, description, project, dueDate, priority, div) {
   const textForTitle = createDOMElement("p", "task-title", `Title: ${title}`);
+  const textForDescription = createDOMElement(
+    "p",
+    "task-description",
+    `Description: ${description}`
+  );
   const textForProject = createDOMElement(
     "p",
     "task-project",
@@ -87,6 +98,7 @@ function createTextFields(title, project, dueDate, priority, div) {
   );
 
   appendElement(div, textForTitle);
+  appendElement(div, textForDescription);
   appendElement(div, textForProject);
   appendElement(div, textForDueDate);
   appendElement(div, textForPriority);
@@ -267,3 +279,141 @@ const createTaskInsideProject = createDOMElement(
   "+"
 );
 appendElement(todoBlock, createTaskInsideProject);
+
+// Create backdrop
+const backdropElemenent = createDOMElement("div", "backdrop", "");
+backdropElemenent.style.display = "none";
+appendElement(document.body, backdropElemenent);
+
+// Popup form
+const createTodoForm = createDOMElement("form", "create-todo-form", "");
+appendElement(backdropElemenent, createTodoForm);
+
+function createLabel(forAttr, textCont) {
+  const label = document.createElement("label");
+  label.setAttribute("for", forAttr);
+  label.textContent = textCont;
+  return label;
+}
+
+function createInputElem(inputType, nameAttr, inputId, hintText) {
+  const input = document.createElement("input");
+  input.setAttribute("type", inputType);
+  input.setAttribute("name", nameAttr);
+  input.setAttribute("id", inputId);
+  input.setAttribute("placeholder", hintText);
+
+  return input;
+}
+
+(function createInputFields() {
+  for (let i = 0; i < 5; i++) {
+    const para = createDOMElement("p", "popup-menu", "");
+    appendElement(createTodoForm, para);
+
+    let label;
+    let input;
+    if (i === 0) {
+      label = createLabel("for-title", "Title:");
+      input = createInputElem("text", "todo-title", "for-title", "Groceries");
+    } else if (i === 1) {
+      label = createLabel("for-description", "Description:");
+      input = createInputElem(
+        "text",
+        "todo-description",
+        "for-description",
+        "Buy all ingredients"
+      );
+    } else if (i === 2) {
+      label = createLabel("for-due-date", "Due date:");
+      // type of input ---> date
+      input = createInputElem(
+        "text",
+        "todo-due-date",
+        "for-due-date",
+        "28/07/2023"
+      );
+    } else if (i === 3) {
+      label = createLabel("for-priority", "Priority:");
+      input = createInputElem(
+        "text",
+        "todo-priority",
+        "for-priority",
+        "Highest - 1, lowest - 3"
+      );
+    } else if (i === 4) {
+      label = createLabel("for-project", "Project:");
+      // type of input select ---> only projects that exist in the projects array + default project (inbox)
+      input = createInputElem(
+        "text",
+        "todo-project",
+        "for-project",
+        "Specify a project"
+      );
+    }
+
+    appendElement(para, label);
+    appendElement(para, input);
+  }
+})();
+
+(function createControlPopupButtons() {
+  const div = createDOMElement("div", "control-popup-div", "");
+  const createTodoButton = createDOMElement("button", "create-tasks", "Add");
+  createTodoButton.setAttribute("type", "submit");
+  const closePopupMenuButton = createDOMElement(
+    "button",
+    "close-popup",
+    "Cancel"
+  );
+  closePopupMenuButton.setAttribute("type", "button");
+  createTodoButton.setAttribute("type", "button");
+
+  appendElement(createTodoForm, div);
+  appendElement(div, closePopupMenuButton);
+  appendElement(div, createTodoButton);
+})();
+
+// Manipulation with popup
+function openPopup() {
+  backdropElemenent.style.display = "block";
+  freezeBackground();
+}
+
+function closePopup() {
+  backdropElemenent.style.display = "none";
+  unfreezeBackground();
+}
+
+function freezeBackground() {
+  content.addEventListener("keydown", preventTabbingOnBackground);
+}
+
+function unfreezeBackground() {
+  content.removeEventListener("keydown", preventTabbingOnBackground);
+}
+
+function preventTabbingOnBackground(e) {
+  if (e.key === "Tab") {
+    e.preventDefault();
+  }
+}
+
+function openPopupFromProject(e) {
+  const createdDirectlyOnProject = findClick(e, ".create-task-directly");
+
+  if (createdDirectlyOnProject) {
+    const autoProject = findChosenProject();
+    getAutoProjectInput(autoProject);
+    openPopup();
+  }
+}
+
+function getAutoProjectInput(project) {
+  const input = document.querySelector("#for-project");
+  input.setAttribute("value", project);
+  input.setAttribute("readonly", "readonly");
+}
+
+// remove attributes? so that project input field does not lose its value
+// readonly option should be disabled on global creation 

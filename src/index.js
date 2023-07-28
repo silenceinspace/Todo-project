@@ -9,6 +9,7 @@ import {
   createTaskButton,
   createProjectButton,
   displayForTasks,
+  createTodoForm,
   createTaskInsideProject,
 } from "./sectionWithDom";
 
@@ -16,6 +17,7 @@ import "./main.css";
 import "./inbox-block.css";
 import "./project-block.css";
 import "./todo-block.css";
+import "./popup-menu.css";
 
 // Section containing program logic
 let mainStorage = [];
@@ -25,92 +27,89 @@ let projectStorage = [];
 console.log("Project storage:");
 console.log(projectStorage);
 
-// 1) Create a todo directly in a task
-// 2) Create a todo globally - project name is required
-DOMMethods.createEventListener(createTaskInsideProject, "click", createTodo);
-DOMMethods.createEventListener(createTaskButton, "click", createTodo);
+// function getInputForTaskDueDate() {
+//   // Fow now hardcore data objects to compare dates. But eventually get 3 numbers from date input and put them into new Date(num1, num2, num3)
+//   let dueDate = prompt("Due date?", "");
+//   if (dueDate === "1") {
+//     dueDate = new Date();
+//   } else if (dueDate === "2") {
+//     dueDate = new Date(2018, 11, 24);
+//   } else if (dueDate === "3") {
+//     dueDate = new Date(2028, 11, 24);
+//   } else if (dueDate === "4") {
+//     dueDate = new Date(2023, 7, 2);
+//   } else if (dueDate === "5") {
+//     dueDate = new Date(2023, 6, 28);
+//   }
+//   return dueDate;
+// }
 
-// Get input from a user
-function getInputForTaskProject() {
-  let project;
-  const customProjectExists = checkForCustomProjects();
-  if (customProjectExists) {
-    project = "inbox";
-  } else {
-    project = prompt("Project?", "");
-  }
-  return project;
-}
-
-// Assign all tasks to a default project if true
-function checkForCustomProjects() {
-  if (projectStorage.length === 0) {
-    alert(
-      "You have not created any project yet. Your tasks are put into inbox"
-    );
-    return true;
-  }
-}
-
-function getInputForTaskTitle() {
-  const title = prompt("Title", "");
+// Open popup
+DOMMethods.createEventListener(
+  createTaskInsideProject,
+  "click",
+  DOMMethods.openPopupFromProject
+);
+DOMMethods.createEventListener(createTaskButton, "click", DOMMethods.openPopup);
+// Cancel/add todo (event delegation)
+DOMMethods.createEventListener(createTodoForm, "click", controlPopupView);
+function getTitleInput() {
+  const title = document.querySelector("#for-title").value;
   return title;
 }
 
-function getInputForTaskDueDate() {
-  // Fow now hardcore data objects to compare dates. But eventually get 3 numbers from date input and put them into new Date(num1, num2, num3)
-  let dueDate = prompt("Due date?", "");
-  if (dueDate === "1") {
-    dueDate = new Date();
-  } else if (dueDate === "2") {
-    dueDate = new Date(2018, 11, 24);
-  } else if (dueDate === "3") {
-    dueDate = new Date(2028, 11, 24);
-  } else if (dueDate === "4") {
-    dueDate = new Date(2023, 7, 2);
-  } else if (dueDate === "5") {
-    dueDate = new Date(2023, 6, 28);
-  }
+function getDescriptionInput() {
+  const description = document.querySelector("#for-description").value;
+  return description;
+}
+
+function getDueDateInput() {
+  const dueDate = document.querySelector("#for-due-date").value;
   return dueDate;
 }
 
-function getInputForTaskPriority() {
-  const priority = prompt("Priority", "");
+function getPriorityInput() {
+  const priority = document.querySelector("#for-priority").value;
   return priority;
 }
 
-function limitTasksOnDateCategories() {
-  const currentCategory = DOMMethods.findChosenProject();
-  if (currentCategory === "today" || currentCategory === "upcoming") {
-    alert("You can't manipulate with tasks inside the category");
-    return true;
-  }
+function getProjectInput() {
+  const project = document.querySelector("#for-project").value;
+  return project;
 }
 
-function createTodo(e) {
-  let project;
-  const createdDirectlyOnProject = DOMMethods.findClick(
-    e,
-    ".create-task-directly"
-  );
-  const disableManipulation = limitTasksOnDateCategories();
+function resetInputValues() {
+  const inputs = document.querySelectorAll("input");
+  inputs.forEach((input) => (input.value = ""));
+}
 
-  if (createdDirectlyOnProject) {
-    // Not allowing to create tasks in these categories
-    if (disableManipulation) return;
-    project = DOMMethods.findChosenProject();
-  } else {
-    project = getInputForTaskProject();
-  }
+function createTodo() {
+  // const disableManipulation = limitTasksOnDateCategories();
+  //   // Not allowing to create tasks in these categories
+  //   if (disableManipulation) return;
 
-  let title = getInputForTaskTitle();
-  let dueDate = getInputForTaskDueDate();
-  let priority = getInputForTaskPriority();
-  const task = new Todo(project, title, dueDate, priority);
+  let title = getTitleInput();
+  let description = getDescriptionInput();
+  let dueDate = getDueDateInput();
+  let priority = getPriorityInput();
+  let project = getProjectInput();
+
+  const task = new Todo(project, title, description, dueDate, priority);
   mainStorage = taskInterface.add(task);
   console.log(mainStorage);
-  // Dynamically render newly created tasks
+  // // Dynamically render newly created tasks
   DOMMethods.updateTodoDisplay();
+}
+
+function controlPopupView(e) {
+  const btn = e.target.textContent;
+  if (btn === "Cancel") {
+    DOMMethods.closePopup();
+  } else if (btn === "Add") {
+    createTodo(e);
+    resetInputValues();
+    DOMMethods.closePopup();
+  }
 }
 
 // Display all todos in a project/date category
@@ -125,6 +124,14 @@ DOMMethods.createEventListener(
   "click",
   DOMMethods.displayTasksInThisProject
 );
+
+function limitTasksOnDateCategories() {
+  const currentCategory = DOMMethods.findChosenProject();
+  if (currentCategory === "today" || currentCategory === "upcoming") {
+    alert("You can't manipulate with tasks inside the category");
+    return true;
+  }
+}
 
 // Remove a task
 DOMMethods.createEventListener(displayForTasks, "click", removeTask);
@@ -157,7 +164,8 @@ function slowDownTaskCompleting(taskPara, idPara) {
 
 function completeTask(e) {
   // Not allow completing tasks in today/upcoming categories
-  if (limitTasksOnDateCategories()) return;
+  const disableManipulation = limitTasksOnDateCategories();
+  if (disableManipulation) return;
 
   const taskStatus = DOMMethods.checkTaskStatus(e);
   if (taskStatus) {

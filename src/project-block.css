@@ -3,9 +3,9 @@
   grid-row: 2/3;
   margin-top: 10px;
 
-  width: 120px;
+  width: 300px;
   display: grid;
-  grid-auto-rows: 30px;
+  grid-auto-rows: 40px;
   gap: 10px;
 
   border: green solid 2px;
@@ -17,8 +17,8 @@
       font-size: 1.2rem;
       font-weight: bold;
       text-align: center;
-      width: 100px;
-      height: 30px;
+      width: 250px;
+      height: 40px;
 
       background-color: coral;
       color: skyblue;
@@ -28,7 +28,8 @@
     & span {
       color: white;
       background-color: grey;
-      font-size: 1.4rem;
+      font-size: 2rem;
+      padding: 0 10px;
       font-weight: bold;
 
       &:hover {

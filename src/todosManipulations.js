@@ -6,10 +6,11 @@ import addDays from "date-fns/addDays";
 
 class Todo extends Project {
   // Creates a todo
-  constructor(projectTitle, title, dueDate, priority) {
+  constructor(projectTitle, title, description, dueDate, priority) {
     // Base class is Project that has a project property on its constructor
     super(projectTitle);
     this.title = title;
+    this.description = description;
     this.dueDate = dueDate;
     this.priority = priority;
     this.id = self.crypto.randomUUID();
@@ -28,6 +29,14 @@ class Todo extends Project {
   }
   set todoTitle(value) {
     this.title = value;
+  }
+
+  get todoDescription() {
+    return this.description;
+  }
+
+  set todoDescription(value) {
+    this.description = value;
   }
 
   get todoDueDate() {
