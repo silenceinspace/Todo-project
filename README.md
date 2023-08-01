@@ -97,22 +97,26 @@ Questions to ask myself at the beginning of a project:
 **Identifying first essential steps**
 
 1. Plan out the structure of my code
+
 - how many modules will I have?
 - what will each module be responsible for?
 - how will modules communicate with each other?
 
 2. Task creation
+
 - should I use classes or factories?
 - what properties will tasks have?
 - where will I store tasks?
 
 3. Operations with tasks
+
 - how can I retrieve a specific task from the storage?
 - how will I know that a task belongs to a particular project?
 - what info can I edit on tasks? and how will they be updated then?
 - how I should "mark" tasks to remove the needed ones easier?
 
 4. Project management
+
 - how can I create a custom project?
 - how will all tasks get access (can be tied with) to new projects?
 - should I have a project "manager" that will watch and be able to modify all projects?

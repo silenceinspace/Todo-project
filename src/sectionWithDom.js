@@ -1,13 +1,11 @@
 import { taskInterface } from "./todosManipulations";
+import { projectInterface } from "./projectManagement";
 // Export functions
 export {
   findClick,
-  findChosenProject,
   createEventListener,
-  removePreviousTasksFromDOM,
   highlightProject,
   findClosestDataAttibute,
-  displayTasksInThisProject,
   updateTodoDisplay,
   displayNewProject,
   checkTaskStatus,
@@ -16,23 +14,82 @@ export {
   getIdOfSpecificTask,
   getSiblingElementText,
   removeProjectBtn,
-  openPopupFromProject,
-  openPopup,
   closePopup,
 };
 // Export variables
-export {
-  projectBlock,
-  inboxBlock,
-  createTaskButton,
-  createProjectButton,
-  displayForTasks,
-  createTaskInsideProject,
-  createTodoForm,
-};
+export { createProjectButton, projectBlock, displayForTasks, createTodoForm };
 
-//////////////////////
-// Local functions for this file (not exported)
+////////////////////////////
+// The only one HTML element //
+////////////////////////////
+const content = document.querySelector("#content");
+
+////////////////////////////
+// Create DOM ELEMENTS //
+////////////////////////////
+const inboxBlock = createDOMElement("div", "inbox-div", "");
+const projectBlock = createDOMElement("div", "project-div", "");
+const todoBlock = createDOMElement("div", "todo-div", "");
+const inbox = createDOMElement("button", "button-inbox", "inbox");
+const today = createDOMElement("button", "button-today", "today");
+const upcoming = createDOMElement("button", "button-upcoming", "upcoming");
+const createTaskButton = createDOMElement(
+  "button",
+  "create-tasks",
+  "Create task"
+);
+const createProjectButton = createDOMElement(
+  "button",
+  "create-projects",
+  "Create project"
+);
+const displayForTasks = createDOMElement("div", "display-tasks", "");
+const createTaskInsideProject = createDOMElement(
+  "button",
+  "create-task-directly",
+  "+"
+);
+const projectHeading = createDOMElement("div", "project-heading", "PROJECTS:");
+const backdropElemenent = createDOMElement("div", "backdrop", "");
+const createTodoForm = createDOMElement("form", "create-todo-form", "");
+
+////////////////////////////
+// Append DOM ELEMENTS //
+////////////////////////////
+appendElement(content, inboxBlock);
+appendElement(content, projectBlock);
+appendElement(content, todoBlock);
+appendElement(inboxBlock, inbox);
+appendElement(inboxBlock, today);
+appendElement(inboxBlock, upcoming);
+appendElement(todoBlock, createTaskButton);
+appendElement(todoBlock, createProjectButton);
+appendElement(todoBlock, displayForTasks);
+appendElement(todoBlock, createTaskInsideProject);
+appendElement(document.body, backdropElemenent);
+appendElement(backdropElemenent, createTodoForm);
+appendElement(projectBlock, projectHeading);
+
+////////////////////////////
+// Add minor changes to DOM ELEMENTS //
+////////////////////////////
+inbox.disabled = true;
+inbox.classList.add("project");
+today.classList.add("project");
+upcoming.classList.add("project");
+backdropElemenent.style.display = "none";
+
+////////////////////////////
+// Event listeners to DOM ELEMENTS //
+////////////////////////////
+createEventListener(projectBlock, "click", displayTasksInThisProject);
+createEventListener(inboxBlock, "click", displayTasksInThisProject);
+createEventListener(createTaskInsideProject, "click", openPopup);
+createEventListener(createTaskButton, "click", openPopup);
+
+////////////////////////////
+// Non-exported functions //
+////////////////////////////
 function createDOMElement(name, className, text) {
   let elem = document.createElement(name);
   elem.classList.add(className);
@@ -44,64 +101,201 @@ function appendElement(parent, child) {
   parent.append(child);
 }
 
+function createLabel(forAttr, textCont) {
+  const label = document.createElement("label");
+  label.setAttribute("for", forAttr);
+  label.textContent = textCont;
+  return label;
+}
+
+function createInputElem(inputType, nameAttr, inputId, hintText) {
+  const input = document.createElement("input");
+  input.setAttribute("type", inputType);
+  input.setAttribute("name", nameAttr);
+  input.setAttribute("id", inputId);
+  input.setAttribute("placeholder", hintText);
+  return input;
+}
+
+function createSelectBox(selectId, selectName) {
+  const select = document.createElement("select");
+  select.setAttribute("id", selectId);
+  select.setAttribute("name", selectName);
+  return select;
+}
+
+function createSelectOption(optionValue, optionText) {
+  const option = document.createElement("option");
+  option.setAttribute("value", optionValue);
+  option.textContent = optionText;
+  return option;
+}
+
+// Popup menu
+(function createInputFields() {
+  for (let i = 0; i < 5; i++) {
+    const para = createDOMElement("p", "popup-menu", "");
+    appendElement(createTodoForm, para);
+
+    let label;
+    let input;
+    if (i === 0) {
+      label = createLabel("for-title", "Title:");
+      input = createInputElem("text", "todo-title", "for-title", "Groceries");
+    } else if (i === 1) {
+      label = createLabel("for-description", "Description:");
+      input = createInputElem(
+        "text",
+        "todo-description",
+        "for-description",
+        "Buy all ingredients"
+      );
+    } else if (i === 2) {
+      label = createLabel("for-due-date", "Due date:");
+      // type of input ---> date
+      input = createInputElem(
+        "date",
+        "todo-due-date",
+        "for-due-date",
+        "01/01/2020"
+      );
+    } else if (i === 3) {
+      label = createLabel("for-priority", "Priority:");
+      input = createSelectBox("for-priority", "priorities");
+      const onePriority = createSelectOption("1", "1");
+      const twoPriority = createSelectOption("2", "2");
+      const threePriority = createSelectOption("3", "3");
+      const noPriority = createSelectOption("-", "-");
+      appendElement(input, noPriority);
+      appendElement(input, onePriority);
+      appendElement(input, twoPriority);
+      appendElement(input, threePriority);
+    } else if (i === 4) {
+      label = createLabel("for-project", "Project:");
+      input = createSelectBox("for-project", "projects");
+    }
+
+    appendElement(para, label);
+    appendElement(para, input);
+  }
+})();
+
+function generateProjectOptions() {
+  const inputField = document.querySelector("#for-project");
+  removePreviousTasksFromDOM(inputField);
+
+  const options = ["inbox"];
+  const projectArray = projectInterface.projects;
+  projectArray.forEach((project) => options.push(project.titleOfProject));
+
+  options.forEach((option) => {
+    const selectOption = createSelectOption(option, option);
+    appendElement(inputField, selectOption);
+  });
+  console.log(options);
+}
+
+(function createControlPopupButtons() {
+  const div = createDOMElement("div", "control-popup-div", "");
+  const createTodoButton = createDOMElement("button", "create-tasks", "Add");
+  createTodoButton.setAttribute("type", "submit");
+  const closePopupMenuButton = createDOMElement(
+    "button",
+    "close-popup",
+    "Cancel"
+  );
+  closePopupMenuButton.setAttribute("type", "button");
+  createTodoButton.setAttribute("type", "button");
+
+  appendElement(createTodoForm, div);
+  appendElement(div, closePopupMenuButton);
+  appendElement(div, createTodoButton);
+})();
+
+function openPopup(e) {
+  resetFormInputs();
+  const inputField = document.querySelector("#for-project");
+  generateProjectOptions();
+
+  const createdDirectlyOnProject = findClick(e, ".create-task-directly");
+  if (createdDirectlyOnProject) {
+    const noCreationOnSpecialCategories = limitTasksOnDateCategories();
+    if (noCreationOnSpecialCategories) return;
+    const autoProject = findChosenProject();
+    getAutoProjectInput(inputField, autoProject);
+  } else {
+    removeDisabledAttr(inputField);
+  }
+  backdropElemenent.style.display = "block";
+  freezeBackground();
+}
+
+// Background cannot be tabbed through when popup menu is open
+function preventTabbingOnBackground(e) {
+  if (e.key === "Tab") {
+    e.preventDefault();
+  }
+}
+
+function freezeBackground() {
+  content.addEventListener("keydown", preventTabbingOnBackground);
+}
+
+function unfreezeBackground() {
+  content.removeEventListener("keydown", preventTabbingOnBackground);
+}
+
+function resetFormInputs() {
+  const form = document.querySelector("form");
+  form.reset();
+}
+
+function getAutoProjectInput(projectField, project) {
+  let childOptions = projectField.childNodes;
+  for (let i = 0; i < childOptions.length; i++) {
+    if (childOptions[i].textContent === project) {
+      childOptions[i].setAttribute("selected", "");
+      setDisabledAttr(projectField);
+    }
+  }
+}
+
+function setDisabledAttr(elem) {
+  elem.setAttribute("disabled", "");
+}
+
+function removeDisabledAttr(elem) {
+  elem.removeAttribute("disabled");
+}
+
+// Visually demonstrate todos
 function createBlocksToRepresentTasks(project) {
   for (let i = 0; i < project.length; i++) {
     const taskDiv = createDOMElement("div", "task-div", "");
-    taskDiv.setAttribute("data-id", project[i].id);
     const removeButton = createDOMElement("button", "remove-task", "X");
     const checkList = createDOMElement("input", "check-box", "");
-    checkList.setAttribute("type", "checkbox");
     const titlePara = project[i].todoTitle;
     const descriptionPara = project[i].todoDescription;
-    const projectPara = project[i].todoProject;
-    const priorityPara = project[i].todoPriority;
     const dueDatePara = project[i].todoDueDate;
-
+    const priorityPara = project[i].todoPriority;
+    const projectPara = project[i].todoProject;
     appendElement(displayForTasks, taskDiv);
     appendElement(taskDiv, removeButton);
     appendElement(taskDiv, checkList);
+    taskDiv.setAttribute("data-id", project[i].id);
+    checkList.setAttribute("type", "checkbox");
 
     setColorOnChecklist(priorityPara, checkList);
 
     createTextFields(
       titlePara,
       descriptionPara,
-      projectPara,
-      priorityPara,
       dueDatePara,
+      priorityPara,
+      projectPara,
       taskDiv
     );
   }
-}
-
-function createTextFields(title, description, project, dueDate, priority, div) {
-  const textForTitle = createDOMElement("p", "task-title", `Title: ${title}`);
-  const textForDescription = createDOMElement(
-    "p",
-    "task-description",
-    `Description: ${description}`
-  );
-  const textForProject = createDOMElement(
-    "p",
-    "task-project",
-    `Project: ${project}`
-  );
-  const textForDueDate = createDOMElement(
-    "p",
-    "task-dueDate",
-    `Due by: ${dueDate}`
-  );
-  const textForPriority = createDOMElement(
-    "p",
-    "task-priority",
-    `Priority: ${priority}`
-  );
-
-  appendElement(div, textForTitle);
-  appendElement(div, textForDescription);
-  appendElement(div, textForProject);
-  appendElement(div, textForDueDate);
-  appendElement(div, textForPriority);
 }
 
 function setColorOnChecklist(priorityLevel, element) {
@@ -117,6 +311,37 @@ function setColorOnChecklist(priorityLevel, element) {
   }
 }
 
+function createTextFields(title, description, dueDate, priority, project, div) {
+  const textForTitle = createDOMElement("p", "task-title", `Title: ${title}`);
+  const textForDescription = createDOMElement(
+    "p",
+    "task-description",
+    `Description: ${description}`
+  );
+  const textForDueDate = createDOMElement(
+    "p",
+    "task-dueDate",
+    `Due by: ${dueDate}`
+  );
+  const textForPriority = createDOMElement(
+    "p",
+    "task-priority",
+    `Priority: ${priority}`
+  );
+  const textForProject = createDOMElement(
+    "p",
+    "task-project",
+    `Project: ${project}`
+  );
+
+  appendElement(div, textForTitle);
+  appendElement(div, textForDescription);
+  appendElement(div, textForProject);
+  appendElement(div, textForDueDate);
+  appendElement(div, textForPriority);
+}
+
+// Imitate a slow task completion
 function selectAllParagraphs(e) {
   const parargraphs = e.target.parentNode.querySelectorAll("p");
   return parargraphs;
@@ -124,7 +349,7 @@ function selectAllParagraphs(e) {
 
 function generateListOfTasks(project) {
   // Clear the todo block not to duplicate appended elements
-  removePreviousTasksFromDOM();
+  removePreviousTasksFromDOM(displayForTasks);
 
   let currentCategory;
   if (project === "today") {
@@ -146,8 +371,28 @@ function grabTitleOfActiveProject(e) {
   return title;
 }
 
-///////////////////////
-// Exported functions
+function displayTasksInThisProject(e) {
+  // Click occurs on the inside of a button
+  const btn = findClick(e, "button");
+  if (!btn) return;
+
+  const title = grabTitleOfActiveProject(e);
+  highlightProject(title);
+  generateListOfTasks(title);
+}
+
+// The user cannot create tasks directly on the today/upcoming categories
+function limitTasksOnDateCategories() {
+  const currentCategory = findChosenProject();
+  if (currentCategory === "today" || currentCategory === "upcoming") {
+    alert("You can't  manipulate with tasks inside the category");
+    return true;
+  }
+}
+
+////////////////////////////
+// Exported functions //
+////////////////////////////
 function findClick(e, value) {
   const elem = e.target.closest(value);
   return elem;
@@ -162,8 +407,8 @@ function createEventListener(forElem, type, func) {
   forElem.addEventListener(type, func);
 }
 
-function removePreviousTasksFromDOM() {
-  displayForTasks.replaceChildren();
+function removePreviousTasksFromDOM(elem) {
+  elem.replaceChildren();
 }
 
 function highlightProject(value = "inbox") {
@@ -184,16 +429,6 @@ function findClosestDataAttibute(e) {
 function getIdOfSpecificTask(task) {
   const id = task.getAttribute("data-id");
   return id;
-}
-
-function displayTasksInThisProject(e) {
-  // Click occurs on the inside of a button
-  const btn = findClick(e, "button");
-  if (!btn) return;
-
-  const title = grabTitleOfActiveProject(e);
-  highlightProject(title);
-  generateListOfTasks(title);
 }
 
 function updateTodoDisplay() {
@@ -234,186 +469,8 @@ function removeProjectBtn(element) {
   element.parentNode.remove();
 }
 
-////////////////////////////
-// Main layout
-const content = document.querySelector("#content");
-const inboxBlock = createDOMElement("div", "inbox-div", "");
-const projectBlock = createDOMElement("div", "project-div", "");
-const todoBlock = createDOMElement("div", "todo-div", "");
-appendElement(content, inboxBlock);
-appendElement(content, projectBlock);
-appendElement(content, todoBlock);
-
-// Default block
-const inbox = createDOMElement("button", "button-inbox", "inbox");
-inbox.disabled = true;
-inbox.classList.add("project");
-const today = createDOMElement("button", "button-today", "today");
-today.classList.add("project");
-const upcoming = createDOMElement("button", "button-upcoming", "upcoming");
-upcoming.classList.add("project");
-appendElement(inboxBlock, inbox);
-appendElement(inboxBlock, today);
-appendElement(inboxBlock, upcoming);
-
-// For now to allow task/project creation
-const createTaskButton = createDOMElement(
-  "button",
-  "create-tasks",
-  "Create task"
-);
-const createProjectButton = createDOMElement(
-  "button",
-  "create-projects",
-  "Create project"
-);
-const displayForTasks = createDOMElement("div", "display-tasks", "");
-appendElement(todoBlock, createTaskButton);
-appendElement(todoBlock, createProjectButton);
-appendElement(todoBlock, displayForTasks);
-
-// Create tasks locally in a project
-const createTaskInsideProject = createDOMElement(
-  "button",
-  "create-task-directly",
-  "+"
-);
-appendElement(todoBlock, createTaskInsideProject);
-
-// Create backdrop
-const backdropElemenent = createDOMElement("div", "backdrop", "");
-backdropElemenent.style.display = "none";
-appendElement(document.body, backdropElemenent);
-
-// Popup form
-const createTodoForm = createDOMElement("form", "create-todo-form", "");
-appendElement(backdropElemenent, createTodoForm);
-
-function createLabel(forAttr, textCont) {
-  const label = document.createElement("label");
-  label.setAttribute("for", forAttr);
-  label.textContent = textCont;
-  return label;
-}
-
-function createInputElem(inputType, nameAttr, inputId, hintText) {
-  const input = document.createElement("input");
-  input.setAttribute("type", inputType);
-  input.setAttribute("name", nameAttr);
-  input.setAttribute("id", inputId);
-  input.setAttribute("placeholder", hintText);
-
-  return input;
-}
-
-(function createInputFields() {
-  for (let i = 0; i < 5; i++) {
-    const para = createDOMElement("p", "popup-menu", "");
-    appendElement(createTodoForm, para);
-
-    let label;
-    let input;
-    if (i === 0) {
-      label = createLabel("for-title", "Title:");
-      input = createInputElem("text", "todo-title", "for-title", "Groceries");
-    } else if (i === 1) {
-      label = createLabel("for-description", "Description:");
-      input = createInputElem(
-        "text",
-        "todo-description",
-        "for-description",
-        "Buy all ingredients"
-      );
-    } else if (i === 2) {
-      label = createLabel("for-due-date", "Due date:");
-      // type of input ---> date
-      input = createInputElem(
-        "text",
-        "todo-due-date",
-        "for-due-date",
-        "28/07/2023"
-      );
-    } else if (i === 3) {
-      label = createLabel("for-priority", "Priority:");
-      input = createInputElem(
-        "text",
-        "todo-priority",
-        "for-priority",
-        "Highest - 1, lowest - 3"
-      );
-    } else if (i === 4) {
-      label = createLabel("for-project", "Project:");
-      // type of input select ---> only projects that exist in the projects array + default project (inbox)
-      input = createInputElem(
-        "text",
-        "todo-project",
-        "for-project",
-        "Specify a project"
-      );
-    }
-
-    appendElement(para, label);
-    appendElement(para, input);
-  }
-})();
-
-(function createControlPopupButtons() {
-  const div = createDOMElement("div", "control-popup-div", "");
-  const createTodoButton = createDOMElement("button", "create-tasks", "Add");
-  createTodoButton.setAttribute("type", "submit");
-  const closePopupMenuButton = createDOMElement(
-    "button",
-    "close-popup",
-    "Cancel"
-  );
-  closePopupMenuButton.setAttribute("type", "button");
-  createTodoButton.setAttribute("type", "button");
-
-  appendElement(createTodoForm, div);
-  appendElement(div, closePopupMenuButton);
-  appendElement(div, createTodoButton);
-})();
-
-// Manipulation with popup
-function openPopup() {
-  backdropElemenent.style.display = "block";
-  freezeBackground();
-}
-
 function closePopup() {
   backdropElemenent.style.display = "none";
   unfreezeBackground();
+  resetFormInputs();
 }
-
-function freezeBackground() {
-  content.addEventListener("keydown", preventTabbingOnBackground);
-}
-
-function unfreezeBackground() {
-  content.removeEventListener("keydown", preventTabbingOnBackground);
-}
-
-function preventTabbingOnBackground(e) {
-  if (e.key === "Tab") {
-    e.preventDefault();
-  }
-}
-
-function openPopupFromProject(e) {
-  const createdDirectlyOnProject = findClick(e, ".create-task-directly");
-
-  if (createdDirectlyOnProject) {
-    const autoProject = findChosenProject();
-    getAutoProjectInput(autoProject);
-    openPopup();
-  }
-}
-
-function getAutoProjectInput(project) {
-  const input = document.querySelector("#for-project");
-  input.setAttribute("value", project);
-  input.setAttribute("readonly", "readonly");
-}
-
-// remove attributes? so that project input field does not lose its value
-// readonly option should be disabled on global creation 

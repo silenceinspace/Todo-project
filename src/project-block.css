@@ -10,7 +10,16 @@
 
   border: green solid 2px;
 
-  & div {
+  & .project-heading {
+    background-color: seagreen;
+    border: 2px solid white;
+    color: white;
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  & div:not(.project-heading) {
     display: flex;
 
     & button {
