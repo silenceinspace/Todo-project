@@ -15,9 +15,10 @@ export {
   getSiblingElementText,
   removeProjectBtn,
   closePopup,
+  toggleNewProjectInputBlock,
 };
 // Export variables
-export { createProjectButton, projectBlock, displayForTasks, createTodoForm };
+export { projectBlock, displayForTasks, createTodoForm, okButton };
 
 ////////////////////////////
 // The only one HTML element //
@@ -52,6 +53,16 @@ const createTaskInsideProject = createDOMElement(
 const projectHeading = createDOMElement("div", "project-heading", "PROJECTS:");
 const backdropElemenent = createDOMElement("div", "backdrop", "");
 const createTodoForm = createDOMElement("form", "create-todo-form", "");
+const createProjectForm = createDOMElement("form", "create-project-form", "");
+const para = createDOMElement("p", "popup-menu", "");
+const newProjectInput = createInputElem(
+  "text",
+  "new-project",
+  "for-new-project",
+  "Project name..."
+);
+const okButton = createDOMElement("button", "new-project-button-ok", "OK");
+const xButton = createDOMElement("button", "new-project-button-x", "X");
 
 ////////////////////////////
 // Append DOM ELEMENTS //
@@ -69,6 +80,11 @@ appendElement(todoBlock, createTaskInsideProject);
 appendElement(document.body, backdropElemenent);
 appendElement(backdropElemenent, createTodoForm);
 appendElement(projectBlock, projectHeading);
+appendElement(todoBlock, createProjectForm);
+appendElement(createProjectForm, para);
+appendElement(para, newProjectInput);
+appendElement(para, xButton);
+appendElement(para, okButton);
 
 ////////////////////////////
 // Add minor changes to DOM ELEMENTS //
@@ -77,6 +93,9 @@ inbox.disabled = true;
 inbox.classList.add("project");
 today.classList.add("project");
 upcoming.classList.add("project");
+xButton.setAttribute("type", "button");
+okButton.setAttribute("type", "button");
+createProjectForm.style.display = "none";
 backdropElemenent.style.display = "none";
 
 ////////////////////////////
@@ -86,6 +105,9 @@ createEventListener(projectBlock, "click", displayTasksInThisProject);
 createEventListener(inboxBlock, "click", displayTasksInThisProject);
 createEventListener(createTaskInsideProject, "click", openPopup);
 createEventListener(createTaskButton, "click", openPopup);
+createEventListener(createProjectButton, "click", toggleNewProjectInputBlock);
+createEventListener(xButton, "click", toggleNewProjectInputBlock);
+createEventListener(newProjectInput, "keydown", disableEnterKeyOnInput);
 
 ////////////////////////////
 // Non-exported functions //
@@ -159,6 +181,7 @@ function createSelectOption(optionValue, optionText) {
         "for-due-date",
         "01/01/2020"
       );
+      input.setAttribute("required", "");
     } else if (i === 3) {
       label = createLabel("for-priority", "Priority:");
       input = createSelectBox("for-priority", "priorities");
@@ -180,6 +203,16 @@ function createSelectOption(optionValue, optionText) {
   }
 })();
 
+function toggleNewProjectInputBlock() {
+  const projectInput = document.querySelector(".create-project-form");
+  if (projectInput.style.display === "none") {
+    projectInput.style.display = "block";
+  } else {
+    projectInput.style.display = "none";
+  }
+  resetProjectFormInput();
+}
+
 function generateProjectOptions() {
   const inputField = document.querySelector("#for-project");
   removePreviousTasksFromDOM(inputField);
@@ -198,7 +231,6 @@ function generateProjectOptions() {
 (function createControlPopupButtons() {
   const div = createDOMElement("div", "control-popup-div", "");
   const createTodoButton = createDOMElement("button", "create-tasks", "Add");
-  createTodoButton.setAttribute("type", "submit");
   const closePopupMenuButton = createDOMElement(
     "button",
     "close-popup",
@@ -213,7 +245,7 @@ function generateProjectOptions() {
 })();
 
 function openPopup(e) {
-  resetFormInputs();
+  resetTaskFormInputs();
   const inputField = document.querySelector("#for-project");
   generateProjectOptions();
 
@@ -226,6 +258,7 @@ function openPopup(e) {
   } else {
     removeDisabledAttr(inputField);
   }
+
   backdropElemenent.style.display = "block";
   freezeBackground();
 }
@@ -245,9 +278,20 @@ function unfreezeBackground() {
   content.removeEventListener("keydown", preventTabbingOnBackground);
 }
 
-function resetFormInputs() {
-  const form = document.querySelector("form");
+function resetTaskFormInputs() {
+  const form = document.querySelector("form.create-todo-form");
   form.reset();
+}
+
+function resetProjectFormInput() {
+  const form = document.querySelector("form.create-project-form");
+  form.reset();
+}
+
+function disableEnterKeyOnInput(e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+  }
 }
 
 function getAutoProjectInput(projectField, project) {
@@ -472,5 +516,5 @@ function removeProjectBtn(element) {
 function closePopup() {
   backdropElemenent.style.display = "none";
   unfreezeBackground();
-  resetFormInputs();
+  resetTaskFormInputs();
 }

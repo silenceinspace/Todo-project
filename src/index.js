@@ -4,10 +4,10 @@ import { Project, projectInterface } from "./projectManagement";
 import * as DOMMethods from "./sectionWithDom";
 // Import variables
 import {
-  createProjectButton,
   displayForTasks,
   createTodoForm,
   projectBlock,
+  okButton,
 } from "./sectionWithDom";
 
 import "./main.css";
@@ -26,6 +26,7 @@ console.log(projectStorage);
 
 // Cancel/add todo (event delegation)
 DOMMethods.createEventListener(createTodoForm, "click", controlPopupView);
+DOMMethods.createEventListener(createTodoForm, "keydown", controlPopupView);
 function getTitleInput() {
   const title = document.querySelector("#for-title").value;
   return title;
@@ -51,6 +52,52 @@ function getProjectInput() {
   return project;
 }
 
+function checkInputGeneralRules(inputField) {
+  if (inputField.includes(" ")) {
+    alert("Input cannot contain blank spaces");
+    return true;
+  }
+
+  if (inputField.length > 15) {
+    alert("Too long project name (limit is 15 characters");
+    return true;
+  }
+
+  if (inputField.length !== 0 && inputField.length < 2) {
+    alert("Too short project name (minimum is 2 characters)");
+    return true;
+  }
+
+  if (inputField === "") {
+    alert("Empty input is not allowed");
+    return true;
+  }
+}
+
+function checkDateInput(inputField) {
+  if (inputField === "") {
+    alert("Please choose a due date");
+    return true;
+  }
+}
+
+function checkInputRulesForNewProject(inputName) {
+  if (checkInputGeneralRules(inputName)) return true;
+
+  const projectName = inputName.toLowerCase();
+  if (projectName === "inbox") {
+    alert("Cannot duplicate the name of a default project");
+    return true;
+  }
+
+  for (let i = 0; i < projectStorage.length; i++) {
+    if (projectStorage[i].titleOfProject.toLowerCase() === projectName) {
+      alert("Cannot duplicate project names");
+      return true;
+    }
+  }
+}
+
 function createTodo() {
   let title = getTitleInput();
   let description = getDescriptionInput();
@@ -70,9 +117,13 @@ function createTodo() {
 
 function controlPopupView(e) {
   const btn = e.target.textContent;
-  if (btn === "Cancel") {
+  if (btn === "Cancel" || e.key === "Escape") {
     DOMMethods.closePopup();
-  } else if (btn === "Add") {
+  } else if (btn === "Add" || e.key === "Enter") {
+    // For now imitate similar behavior to a required attribute
+    if (checkInputGeneralRules(getTitleInput())) return;
+    if (checkDateInput(getDueDateInput())) return;
+
     createTodo(e);
     DOMMethods.closePopup();
   }
@@ -120,17 +171,20 @@ function completeTask(e) {
 }
 
 // Create a project
-// Popup menu to create project???
-DOMMethods.createEventListener(createProjectButton, "click", createProject);
-function getInputForNewProject() {
-  const title = prompt("Project name?", "");
+DOMMethods.createEventListener(okButton, "click", createProject);
+function getNewProjectTitle() {
+  const title = document.querySelector("#for-new-project").value;
   return title;
 }
 
 function createProject() {
-  const title = getInputForNewProject();
+  const title = getNewProjectTitle();
+  const isNotAllowed = checkInputRulesForNewProject(title);
+  if (isNotAllowed) return;
+
   const project = new Project(title);
   projectStorage = projectInterface.add(project);
+  DOMMethods.toggleNewProjectInputBlock();
   DOMMethods.displayNewProject(title);
   DOMMethods.highlightProject(title);
   DOMMethods.updateTodoDisplay();
