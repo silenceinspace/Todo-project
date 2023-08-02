@@ -4,12 +4,14 @@ import { Project, projectInterface } from "./projectManagement";
 import * as DOMMethods from "./sectionWithDom";
 // Import variables
 import {
+  okButton,
+  projectBlock,
+  displayNewProject,
   displayForTasks,
   createTodoForm,
-  projectBlock,
-  okButton,
-} from "./sectionWithDom";
+} from "./generateHTML";
 
+// Import styles
 import "./styles/main.css";
 import "./styles/todo-block.css";
 import "./styles/popup-menu.css";
@@ -26,7 +28,6 @@ console.log(projectStorage);
 DOMMethods.createEventListener(createTodoForm, "click", controlPopupView);
 DOMMethods.createEventListener(createTodoForm, "keydown", controlPopupView);
 
-// Get inputs for creation
 function getTitleInput() {
   const title = document.querySelector("#for-title").value;
   return title;
@@ -125,14 +126,12 @@ function createTodo() {
   DOMMethods.updateTodoDisplay();
 }
 
-// Take action on the popup menu
 function controlPopupView(e) {
   const btn = e.target.textContent;
 
   if (btn === "Cancel" || e.key === "Escape") {
     DOMMethods.closePopup();
   } else if (btn === "Add" || e.key === "Enter") {
-    // If an input contains unexpected data/format, then do not proceed to create a todo
     if (checkInputGeneralRules(getTitleInput())) return;
     if (checkDescriptionInputLimit(getDescriptionInput())) return;
     if (checkDateInput(getDueDateInput())) return;
@@ -198,7 +197,7 @@ function createProject() {
   const project = new Project(title);
   projectStorage = projectInterface.add(project);
   DOMMethods.toggleNewProjectInputBlock();
-  DOMMethods.displayNewProject(title);
+  displayNewProject(title);
   DOMMethods.highlightProject(title);
   DOMMethods.updateTodoDisplay();
   console.log(projectStorage);
