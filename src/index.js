@@ -10,11 +10,9 @@ import {
   okButton,
 } from "./sectionWithDom";
 
-import "./main.css";
-import "./inbox-block.css";
-import "./project-block.css";
-import "./todo-block.css";
-import "./popup-menu.css";
+import "./styles/main.css";
+import "./styles/todo-block.css";
+import "./styles/popup-menu.css";
 
 // Section containing program logic
 let mainStorage = [];
@@ -27,6 +25,8 @@ console.log(projectStorage);
 // Cancel/add todo (event delegation)
 DOMMethods.createEventListener(createTodoForm, "click", controlPopupView);
 DOMMethods.createEventListener(createTodoForm, "keydown", controlPopupView);
+
+// Get inputs for creation
 function getTitleInput() {
   const title = document.querySelector("#for-title").value;
   return title;
@@ -52,24 +52,20 @@ function getProjectInput() {
   return project;
 }
 
+// Check input formats (if such a type of data is expected to be processed)
 function checkInputGeneralRules(inputField) {
-  if (inputField.includes(" ")) {
-    alert("Input cannot contain blank spaces");
-    return true;
-  }
-
   if (inputField.length > 15) {
-    alert("Too long project name (limit is 15 characters");
+    alert("Too long title (maximum is 15 characters)");
     return true;
   }
 
   if (inputField.length !== 0 && inputField.length < 2) {
-    alert("Too short project name (minimum is 2 characters)");
+    alert("Too short title (minimum is 2 characters)");
     return true;
   }
 
   if (inputField === "") {
-    alert("Empty input is not allowed");
+    alert("Empty title is not allowed");
     return true;
   }
 }
@@ -81,12 +77,25 @@ function checkDateInput(inputField) {
   }
 }
 
-function checkInputRulesForNewProject(inputName) {
-  if (checkInputGeneralRules(inputName)) return true;
+function checkDescriptionInputLimit(inputField) {
+  if (inputField.length > 100) {
+    alert("Too long description (maximum is 100 characters");
+    return true;
+  }
+}
 
-  const projectName = inputName.toLowerCase();
+function checkInputRulesForNewProject(inputField) {
+  const isNotAllowed = checkInputGeneralRules(inputField);
+  if (isNotAllowed) return true;
+
+  const projectName = inputField.toLowerCase();
   if (projectName === "inbox") {
-    alert("Cannot duplicate the name of a default project");
+    alert("Cannot duplicate the name of the default project");
+    return true;
+  }
+
+  if (projectName.includes(" ")) {
+    alert("Title cannot contain blank spaces");
     return true;
   }
 
@@ -99,29 +108,33 @@ function checkInputRulesForNewProject(inputName) {
 }
 
 function createTodo() {
-  let title = getTitleInput();
-  let description = getDescriptionInput();
-  let dueDate = getDueDateInput();
-  let priority = getPriorityInput();
-  let project = getProjectInput();
+  const title = getTitleInput();
+  const description = getDescriptionInput();
+  const dueDate = getDueDateInput();
+  const priority = getPriorityInput();
+  const project = getProjectInput();
 
   const task = new Todo(project, title, description, dueDate, priority);
   mainStorage = taskInterface.add(task);
   console.log(mainStorage);
-  // // Dynamically render newly created tasks
+  // Open the inbox project when global todo creation is used with set "inbox" project, but another project is highlighted
   if (project === "inbox") {
     DOMMethods.highlightProject();
   }
+  // Dynamically render newly created tasks
   DOMMethods.updateTodoDisplay();
 }
 
+// Take action on the popup menu
 function controlPopupView(e) {
   const btn = e.target.textContent;
+
   if (btn === "Cancel" || e.key === "Escape") {
     DOMMethods.closePopup();
   } else if (btn === "Add" || e.key === "Enter") {
-    // For now imitate similar behavior to a required attribute
+    // If an input contains unexpected data/format, then do not proceed to create a todo
     if (checkInputGeneralRules(getTitleInput())) return;
+    if (checkDescriptionInputLimit(getDescriptionInput())) return;
     if (checkDateInput(getDueDateInput())) return;
 
     createTodo(e);
@@ -147,10 +160,10 @@ function removeTask(e) {
 
 // Complete a task
 DOMMethods.createEventListener(displayForTasks, "change", completeTask);
-function slowDownTaskCompleting(taskPara, idPara) {
+function slowDownTaskCompleting(blockWithTaskInfo, idParagraph) {
   setTimeout(() => {
-    taskPara.remove();
-    mainStorage = taskInterface.remove(idPara);
+    blockWithTaskInfo.remove();
+    mainStorage = taskInterface.remove(idParagraph);
     console.log(mainStorage);
   }, 300);
 }
@@ -173,7 +186,7 @@ function completeTask(e) {
 // Create a project
 DOMMethods.createEventListener(okButton, "click", createProject);
 function getNewProjectTitle() {
-  const title = document.querySelector("#for-new-project").value;
+  const title = document.querySelector("#for-new-project").value.toLowerCase();
   return title;
 }
 
@@ -198,9 +211,9 @@ function confirmChoice() {
   return warning;
 }
 // Clear array in an object from which I take all info and assign to mainStorage
-function changeArraysInMethodObjects(proj) {
+function changeArraysInsideExternalInterfaces(projectName) {
   taskInterface.todos = projectInterface.removeAssociatedTasks(
-    proj,
+    projectName,
     taskInterface.todos
   );
   mainStorage = taskInterface.todos;
@@ -211,9 +224,9 @@ function removeProject(e) {
   if (!span) return;
 
   const project = DOMMethods.getSiblingElementText(span);
-  const answer = confirmChoice();
-  if (answer) {
-    changeArraysInMethodObjects(project);
+  const removalIsConfirmed = confirmChoice();
+  if (removalIsConfirmed) {
+    changeArraysInsideExternalInterfaces(project);
     projectStorage = projectInterface.remove(project);
     DOMMethods.removeProjectBtn(span);
     // While removing an element from DOM and needing to rerender content, it will automatically go back to inbox project

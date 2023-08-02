@@ -17,21 +17,21 @@ class Project {
 const projectInterface = {
   projects: [],
 
-  add(elem) {
-    this.projects.push(elem);
+  add(project) {
+    this.projects.push(project);
     return this.projects;
   },
 
-  remove(value) {
+  remove(project) {
     this.projects = this.projects.filter(
-      (proj) => proj.titleOfProject !== value
+      (proj) => proj.titleOfProject !== project
     );
 
     return this.projects;
   },
 
-  removeAssociatedTasks(proj, storage) {
-    storage = storage.filter((task) => task.todoProject !== proj);
+  removeAssociatedTasks(projectName, storage) {
+    storage = storage.filter((task) => task.todoProject !== projectName);
 
     return storage;
   },

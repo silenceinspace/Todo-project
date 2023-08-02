@@ -5,7 +5,7 @@ import { compareAsc, format } from "date-fns";
 import addDays from "date-fns/addDays";
 
 class Todo extends Project {
-  // Creates a todo
+  // Creates a task
   constructor(projectTitle, title, description, dueDate, priority) {
     // Base class is Project that has a project property on its constructor
     super(projectTitle);
@@ -16,7 +16,7 @@ class Todo extends Project {
     this.id = self.crypto.randomUUID();
   }
 
-  // Updates a todo
+  // Updates a task
   get todoProject() {
     return this.projectTitle;
   }
@@ -59,47 +59,47 @@ class Todo extends Project {
 const taskInterface = {
   // todos array will modify mainStorage array
   todos: [],
-  add(elem) {
-    this.todos.push(elem);
+  add(todo) {
+    this.todos.push(todo);
     return this.todos;
   },
 
-  remove(value) {
-    this.todos = this.todos.filter((task) => task.id !== value);
+  remove(todo) {
+    this.todos = this.todos.filter((task) => task.id !== todo);
     return this.todos;
   },
 
-  findAll(proj) {
-    const arr = [];
-    this.todos.forEach((todo) => {
-      if (todo.todoProject.toLowerCase() === proj.toLowerCase()) {
-        arr.push(todo);
+  findAll(project) {
+    const array = [];
+    this.todos.forEach((task) => {
+      if (task.todoProject.toLowerCase() === project.toLowerCase()) {
+        array.push(task);
       }
     });
-    return arr;
+    return array;
   },
 
   findDueToday() {
-    const arr = [];
+    const array = [];
     const todayDate = format(new Date(), "MM/dd/yyyy");
 
-    this.todos.forEach((todo) => {
-      const formatttedDate = format(todo.todoDueDate, "MM/dd/yyyy");
+    this.todos.forEach((task) => {
+      const formatttedDate = format(task.todoDueDate, "MM/dd/yyyy");
       if (formatttedDate === todayDate) {
-        arr.push(todo);
+        array.push(task);
       }
     });
-    return arr;
+    return array;
   },
 
   findDueUpcoming() {
-    const arr = [];
+    const array = [];
     // Find out if the task's due date lays in between today and next seven days
-    this.todos.forEach((todo) => {
+    this.todos.forEach((task) => {
       const dates = [];
       const todayDate = new Date();
       const nextSevenDays = addDays(todayDate, 7);
-      const currentTodoDate = todo.todoDueDate;
+      const currentTodoDate = task.todoDueDate;
       dates.push(nextSevenDays, todayDate, currentTodoDate);
 
       const result = dates.sort(compareAsc);
@@ -108,26 +108,26 @@ const taskInterface = {
         format(result[1], "MM/dd/yyyy") ===
         format(currentTodoDate, "MM/dd/yyyy")
       ) {
-        arr.push(todo);
+        array.push(task);
       }
     });
-    return arr;
+    return array;
   },
 
-  // update(elem, property, value) {
+  // update(task, property, task) {
   //   if (property.toLowerCase() === "title") {
-  //     console.log(`Old title: ${elem.todoTitle}`);
-  //     elem.todoTitle = value;
-  //     console.log(`Updated title: ${value}`);
+  //     console.log(`Old title: ${task.todoTitle}`);
+  //     task.todoTitle = task;
+  //     console.log(`Updated title: ${task}`);
   //   } else if (property.toLowerCase() === "priority") {
-  //     console.log(`Old title: ${elem.todoPriority}`);
-  //     elem.todoPriority = value;
-  //     console.log(`Updated priority: ${value}`);
+  //     console.log(`Old title: ${task.todoPriority}`);
+  //     task.todoPriority = task;
+  //     console.log(`Updated priority: ${task}`);
   //   } else if (property.toLowerCase() === "project") {
-  //     console.log(`Old title: ${elem.todoProject}`);
-  //     elem.todoProject = value;
-  //     console.log(`Updated property: ${value}`);
+  //     console.log(`Old title: ${task.todoProject}`);
+  //     task.todoProject = task;
+  //     console.log(`Updated property: ${task}`);
   //   }
-  //   console.log(`Full details: "${elem.title}" title`);
+  //   console.log(`Full details: "${task.title}" title`);
   // },
 };

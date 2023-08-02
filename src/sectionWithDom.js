@@ -51,18 +51,25 @@ const createTaskInsideProject = createDOMElement(
   "+"
 );
 const projectHeading = createDOMElement("div", "project-heading", "PROJECTS:");
-const backdropElemenent = createDOMElement("div", "backdrop", "");
+const backdropElement = createDOMElement("div", "backdrop", "");
 const createTodoForm = createDOMElement("form", "create-todo-form", "");
 const createProjectForm = createDOMElement("form", "create-project-form", "");
-const para = createDOMElement("p", "popup-menu", "");
+const projectFormParagraph = createDOMElement("p", "popup-menu", "");
 const newProjectInput = createInputElem(
   "text",
   "new-project",
   "for-new-project",
-  "Project name..."
+  "Project title..."
 );
 const okButton = createDOMElement("button", "new-project-button-ok", "OK");
 const xButton = createDOMElement("button", "new-project-button-x", "X");
+const divWithButtonsInPopup = createDOMElement("div", "control-popup-div", "");
+const addTodoButton = createDOMElement("button", "create-tasks", "Add");
+const closePopupMenuButton = createDOMElement(
+  "button",
+  "close-popup",
+  "Cancel"
+);
 
 ////////////////////////////
 // Append DOM ELEMENTS //
@@ -77,14 +84,14 @@ appendElement(todoBlock, createTaskButton);
 appendElement(todoBlock, createProjectButton);
 appendElement(todoBlock, displayForTasks);
 appendElement(todoBlock, createTaskInsideProject);
-appendElement(document.body, backdropElemenent);
-appendElement(backdropElemenent, createTodoForm);
+appendElement(document.body, backdropElement);
+appendElement(backdropElement, createTodoForm);
 appendElement(projectBlock, projectHeading);
 appendElement(todoBlock, createProjectForm);
-appendElement(createProjectForm, para);
-appendElement(para, newProjectInput);
-appendElement(para, xButton);
-appendElement(para, okButton);
+appendElement(createProjectForm, projectFormParagraph);
+appendElement(projectFormParagraph, newProjectInput);
+appendElement(projectFormParagraph, xButton);
+appendElement(projectFormParagraph, okButton);
 
 ////////////////////////////
 // Add minor changes to DOM ELEMENTS //
@@ -95,8 +102,11 @@ today.classList.add("project");
 upcoming.classList.add("project");
 xButton.setAttribute("type", "button");
 okButton.setAttribute("type", "button");
-createProjectForm.style.display = "none";
-backdropElemenent.style.display = "none";
+closePopupMenuButton.setAttribute("type", "button");
+addTodoButton.setAttribute("type", "button");
+
+setDisplayNone(createProjectForm);
+setDisplayNone(backdropElement);
 
 ////////////////////////////
 // Event listeners to DOM ELEMENTS //
@@ -112,8 +122,8 @@ createEventListener(newProjectInput, "keydown", disableEnterKeyOnInput);
 ////////////////////////////
 // Non-exported functions //
 ////////////////////////////
-function createDOMElement(name, className, text) {
-  let elem = document.createElement(name);
+function createDOMElement(elementName, className, text) {
+  const elem = document.createElement(elementName);
   elem.classList.add(className);
   elem.textContent = text;
   return elem;
@@ -123,17 +133,17 @@ function appendElement(parent, child) {
   parent.append(child);
 }
 
-function createLabel(forAttr, textCont) {
+function createLabel(forAttribute, labelText) {
   const label = document.createElement("label");
-  label.setAttribute("for", forAttr);
-  label.textContent = textCont;
+  label.setAttribute("for", forAttribute);
+  label.textContent = labelText;
   return label;
 }
 
-function createInputElem(inputType, nameAttr, inputId, hintText) {
+function createInputElem(inputType, nameAttribute, inputId, hintText) {
   const input = document.createElement("input");
   input.setAttribute("type", inputType);
-  input.setAttribute("name", nameAttr);
+  input.setAttribute("name", nameAttribute);
   input.setAttribute("id", inputId);
   input.setAttribute("placeholder", hintText);
   return input;
@@ -170,18 +180,16 @@ function createSelectOption(optionValue, optionText) {
         "text",
         "todo-description",
         "for-description",
-        "Buy all ingredients"
+        "Buy eggs, meat, vegetables..."
       );
     } else if (i === 2) {
       label = createLabel("for-due-date", "Due date:");
-      // type of input ---> date
       input = createInputElem(
         "date",
         "todo-due-date",
         "for-due-date",
         "01/01/2020"
       );
-      input.setAttribute("required", "");
     } else if (i === 3) {
       label = createLabel("for-priority", "Priority:");
       input = createSelectBox("for-priority", "priorities");
@@ -197,25 +205,29 @@ function createSelectOption(optionValue, optionText) {
       label = createLabel("for-project", "Project:");
       input = createSelectBox("for-project", "projects");
     }
-
     appendElement(para, label);
     appendElement(para, input);
   }
+
+  // Place control buttons below input fields in the popup menu
+  appendElement(createTodoForm, divWithButtonsInPopup);
+  appendElement(divWithButtonsInPopup, closePopupMenuButton);
+  appendElement(divWithButtonsInPopup, addTodoButton);
 })();
 
+const projectForm = document.querySelector(".create-project-form");
 function toggleNewProjectInputBlock() {
-  const projectInput = document.querySelector(".create-project-form");
-  if (projectInput.style.display === "none") {
-    projectInput.style.display = "block";
+  if (projectForm.style.display === "none") {
+    setDisplayBlock(projectForm);
   } else {
-    projectInput.style.display = "none";
+    setDisplayNone(projectForm);
   }
   resetProjectFormInput();
 }
 
+const projectField = document.querySelector("#for-project");
 function generateProjectOptions() {
-  const inputField = document.querySelector("#for-project");
-  removePreviousTasksFromDOM(inputField);
+  removePreviousTasksFromDOM(projectField);
 
   const options = ["inbox"];
   const projectArray = projectInterface.projects;
@@ -223,30 +235,13 @@ function generateProjectOptions() {
 
   options.forEach((option) => {
     const selectOption = createSelectOption(option, option);
-    appendElement(inputField, selectOption);
+    appendElement(projectField, selectOption);
   });
   console.log(options);
 }
 
-(function createControlPopupButtons() {
-  const div = createDOMElement("div", "control-popup-div", "");
-  const createTodoButton = createDOMElement("button", "create-tasks", "Add");
-  const closePopupMenuButton = createDOMElement(
-    "button",
-    "close-popup",
-    "Cancel"
-  );
-  closePopupMenuButton.setAttribute("type", "button");
-  createTodoButton.setAttribute("type", "button");
-
-  appendElement(createTodoForm, div);
-  appendElement(div, closePopupMenuButton);
-  appendElement(div, createTodoButton);
-})();
-
 function openPopup(e) {
   resetTaskFormInputs();
-  const inputField = document.querySelector("#for-project");
   generateProjectOptions();
 
   const createdDirectlyOnProject = findClick(e, ".create-task-directly");
@@ -254,12 +249,12 @@ function openPopup(e) {
     const noCreationOnSpecialCategories = limitTasksOnDateCategories();
     if (noCreationOnSpecialCategories) return;
     const autoProject = findChosenProject();
-    getAutoProjectInput(inputField, autoProject);
+    getAutoProjectInput(projectField, autoProject);
   } else {
-    removeDisabledAttr(inputField);
+    removeDisabledAttr(projectField);
   }
 
-  backdropElemenent.style.display = "block";
+  setDisplayBlock(backdropElement);
   freezeBackground();
 }
 
@@ -278,6 +273,14 @@ function unfreezeBackground() {
   content.removeEventListener("keydown", preventTabbingOnBackground);
 }
 
+function setDisplayNone(block) {
+  block.style.display = "none";
+}
+
+function setDisplayBlock(block) {
+  block.style.display = "block";
+}
+
 function resetTaskFormInputs() {
   const form = document.querySelector("form.create-todo-form");
   form.reset();
@@ -294,8 +297,8 @@ function disableEnterKeyOnInput(e) {
   }
 }
 
-function getAutoProjectInput(projectField, project) {
-  let childOptions = projectField.childNodes;
+function getAutoProjectInput(project) {
+  const childOptions = projectField.childNodes;
   for (let i = 0; i < childOptions.length; i++) {
     if (childOptions[i].textContent === project) {
       childOptions[i].setAttribute("selected", "");
@@ -410,7 +413,7 @@ function generateListOfTasks(project) {
   createBlocksToRepresentTasks(currentProject);
 }
 
-function grabTitleOfActiveProject(e) {
+function grabProjectTitle(e) {
   const title = e.target.textContent;
   return title;
 }
@@ -420,7 +423,7 @@ function displayTasksInThisProject(e) {
   const btn = findClick(e, "button");
   if (!btn) return;
 
-  const title = grabTitleOfActiveProject(e);
+  const title = grabProjectTitle(e);
   highlightProject(title);
   generateListOfTasks(title);
 }
@@ -514,7 +517,7 @@ function removeProjectBtn(element) {
 }
 
 function closePopup() {
-  backdropElemenent.style.display = "none";
+  setDisplayNone(backdropElement);
   unfreezeBackground();
   resetTaskFormInputs();
 }
