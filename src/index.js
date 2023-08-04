@@ -146,9 +146,11 @@ DOMMethods.createEventListener(displayForTasks, "click", removeTask);
 function removeTask(e) {
   const btn = DOMMethods.findClick(e, "button");
   if (!btn) return;
+
   // Not allow removing tasks in today/upcoming categories
-  // const disableManipulation = limitTasksOnDateCategories();
-  // if (disableManipulation) return;
+  const disableManipulation = DOMMethods.limitTasksOnDateCategories();
+  if (disableManipulation) return;
+
   const task = DOMMethods.findClosestDataAttibute(e);
   const id = DOMMethods.getIdOfSpecificTask(task);
 
@@ -169,8 +171,9 @@ function slowDownTaskCompleting(blockWithTaskInfo, idParagraph) {
 
 function completeTask(e) {
   // Not allow completing tasks in today/upcoming categories
-  // const disableManipulation = limitTasksOnDateCategories();
-  // if (disableManipulation) return;
+  const disableManipulation = DOMMethods.limitTasksOnDateCategories();
+  if (disableManipulation) return;
+
   const taskStatus = DOMMethods.checkTaskStatus(e);
   if (taskStatus) {
     DOMMethods.applyStrikeThroughEffect(e);

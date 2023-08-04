@@ -81,11 +81,12 @@ const taskInterface = {
 
   findDueToday() {
     const array = [];
-    const todayDate = format(new Date(), "MM/dd/yyyy");
+    const todayDate = getMonthDayYearFormat(new Date());
 
     this.todos.forEach((task) => {
-      const formatttedDate = format(task.todoDueDate, "MM/dd/yyyy");
-      if (formatttedDate === todayDate) {
+      const dateObject = createObjectFromDateInput(task.todoDueDate);
+      const formattedDateOjbect = getMonthDayYearFormat(dateObject);
+      if (todayDate === formattedDateOjbect) {
         array.push(task);
       }
     });
@@ -99,14 +100,13 @@ const taskInterface = {
       const dates = [];
       const todayDate = new Date();
       const nextSevenDays = addDays(todayDate, 7);
-      const currentTodoDate = task.todoDueDate;
+      const currentTodoDate = createObjectFromDateInput(task.todoDueDate);
       dates.push(nextSevenDays, todayDate, currentTodoDate);
 
       const result = dates.sort(compareAsc);
-      console.log(result);
       if (
-        format(result[1], "MM/dd/yyyy") ===
-        format(currentTodoDate, "MM/dd/yyyy")
+        getMonthDayYearFormat(result[1]) ===
+        getMonthDayYearFormat(currentTodoDate)
       ) {
         array.push(task);
       }
@@ -131,3 +131,18 @@ const taskInterface = {
   //   console.log(`Full details: "${task.title}" title`);
   // },
 };
+
+// Format a date input and grab individual numbers to use the Date() constructor
+function createObjectFromDateInput(date) {
+  const fromDateInput = date.replaceAll("-", " ").split(" ");
+  const year = fromDateInput[0];
+  const month = fromDateInput[1] - 1;
+  const day = fromDateInput[2];
+  const newDateObject = new Date(year, month, day);
+  return newDateObject;
+}
+
+function getMonthDayYearFormat(date) {
+  const formattedDate = format(date, "MM/dd/yyyy");
+  return formattedDate;
+}

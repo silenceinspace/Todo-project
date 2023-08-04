@@ -33,6 +33,7 @@ export {
   closePopup,
   toggleNewProjectInputBlock,
   setDisplayNone,
+  limitTasksOnDateCategories
 };
 
 ////////////////////////////
