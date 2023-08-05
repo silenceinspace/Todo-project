@@ -33,7 +33,9 @@ export {
   closePopup,
   toggleNewProjectInputBlock,
   setDisplayNone,
-  limitTasksOnDateCategories
+  limitTasksOnDateCategories,
+  selectAllParagraphs,
+  hideExpandedDetails,
 };
 
 ////////////////////////////
@@ -269,4 +271,14 @@ function closePopup() {
   setDisplayNone(backdropElement);
   unfreezeBackground();
   resetTaskFormInputs();
+}
+
+function hideExpandedDetails(button) {
+  const descriptionPara = button.parentNode.querySelector(".task-description");
+  const taskPriority = button.parentNode.querySelector(".task-priority");
+  const taskProject = button.parentNode.querySelector(".task-project");
+  descriptionPara.remove();
+  taskPriority.remove();
+  taskProject.remove();
+  button.classList.remove("expanded");
 }

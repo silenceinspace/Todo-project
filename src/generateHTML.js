@@ -1,7 +1,11 @@
 import { setDisplayNone } from "./sectionWithDom";
+import {
+  createObjectFromDateInput,
+  getMonthDayYearFormat,
+} from "./todosManipulations";
 
 export {
-    // Export variables
+  // Export variables
   content,
   inboxBlock,
   projectBlock,
@@ -15,6 +19,8 @@ export {
   okButton,
   xButton,
   // Export functions
+  createExpandedTextFields,
+  // hideExpandedDetails
   createDOMElement,
   appendElement,
   createBlocksToRepresentTasks,
@@ -170,28 +176,22 @@ function createBlocksToRepresentTasks(project) {
   for (let i = 0; i < project.length; i++) {
     const taskDiv = createDOMElement("div", "task-div", "");
     const removeButton = createDOMElement("button", "remove-task", "X");
+    const expandButton = createDOMElement("button", "expand-task", "...");
     const checkList = createDOMElement("input", "check-box", "");
     const titlePara = project[i].todoTitle;
-    const descriptionPara = project[i].todoDescription;
-    const dueDatePara = project[i].todoDueDate;
+    let dueDatePara = createObjectFromDateInput(project[i].todoDueDate);
+    dueDatePara = getMonthDayYearFormat(dueDatePara, "literal");
     const priorityPara = project[i].todoPriority;
-    const projectPara = project[i].todoProject;
     appendElement(displayForTasks, taskDiv);
     appendElement(taskDiv, removeButton);
+    appendElement(taskDiv, expandButton);
     appendElement(taskDiv, checkList);
     taskDiv.setAttribute("data-id", project[i].id);
     checkList.setAttribute("type", "checkbox");
 
     setColorOnChecklist(priorityPara, checkList);
 
-    createTextFields(
-      titlePara,
-      descriptionPara,
-      dueDatePara,
-      priorityPara,
-      projectPara,
-      taskDiv
-    );
+    createDefaultTextFields(taskDiv, titlePara, dueDatePara);
   }
 }
 
@@ -208,34 +208,26 @@ function setColorOnChecklist(priorityLevel, element) {
   }
 }
 
-function createTextFields(title, description, dueDate, priority, project, div) {
+function createDefaultTextFields(div, title, dueDate) {
   const textForTitle = createDOMElement("p", "task-title", `Title: ${title}`);
+  const textForDueDate = createDOMElement("p", "task-dueDate", `Due date: ${dueDate}`);
+
+  appendElement(div, textForTitle);
+  appendElement(div, textForDueDate);
+}
+
+// expand a todo
+function createExpandedTextFields(div, description, priority, project) {
   const textForDescription = createDOMElement(
     "p",
     "task-description",
     `Description: ${description}`
   );
-  const textForDueDate = createDOMElement(
-    "p",
-    "task-dueDate",
-    `Due by: ${dueDate}`
-  );
-  const textForPriority = createDOMElement(
-    "p",
-    "task-priority",
-    `Priority: ${priority}`
-  );
-  const textForProject = createDOMElement(
-    "p",
-    "task-project",
-    `Project: ${project}`
-  );
-
-  appendElement(div, textForTitle);
+  const textForPriority = createDOMElement("p", "task-priority", `Priority: ${priority}`);
+  const textForProject = createDOMElement("p", "task-project", `Project: ${project}`);
   appendElement(div, textForDescription);
-  appendElement(div, textForProject);
-  appendElement(div, textForDueDate);
   appendElement(div, textForPriority);
+  appendElement(div, textForProject);
 }
 
 function displayNewProject(value) {

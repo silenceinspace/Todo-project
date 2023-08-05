@@ -8,6 +8,7 @@ import {
   projectBlock,
   displayNewProject,
   displayForTasks,
+  createExpandedTextFields,
   createTodoForm,
 } from "./generateHTML";
 
@@ -144,8 +145,8 @@ function controlPopupView(e) {
 // Remove a task
 DOMMethods.createEventListener(displayForTasks, "click", removeTask);
 function removeTask(e) {
-  const btn = DOMMethods.findClick(e, "button");
-  if (!btn) return;
+  const removeTaskButton = DOMMethods.findClick(e, ".remove-task");
+  if (!removeTaskButton) return;
 
   // Not allow removing tasks in today/upcoming categories
   const disableManipulation = DOMMethods.limitTasksOnDateCategories();
@@ -236,5 +237,40 @@ function removeProject(e) {
     DOMMethods.updateTodoDisplay();
     console.log(projectStorage);
     console.log(mainStorage);
+  }
+}
+
+// Expand todo's info
+DOMMethods.createEventListener(displayForTasks, "click", expandTaskBlock);
+function expandTaskBlock(e) {
+  const expandTaskButton = DOMMethods.findClick(e, ".expand-task");
+  if (!expandTaskButton) return;
+
+  const hasExpandedClass = DOMMethods.findClick(e, ".expanded");
+  if (hasExpandedClass) {
+    DOMMethods.hideExpandedDetails(expandTaskButton);
+    return;
+  }
+
+  const task = DOMMethods.findClosestDataAttibute(e);
+  const id = DOMMethods.getIdOfSpecificTask(task);
+  fetchExpandedBlock(expandTaskButton, id, task);
+}
+
+function fetchExpandedBlock(buttonBlock, idBlock, taskBlock) {
+  for (let i = 0; i < mainStorage.length; i++) {
+    if (mainStorage[i].id === idBlock) {
+      const expandedBlock = mainStorage[i];
+      const descriptionPara = expandedBlock.todoDescription;
+      const priorityPara = expandedBlock.todoPriority;
+      const projectPara = expandedBlock.todoProject;
+      createExpandedTextFields(
+        taskBlock,
+        descriptionPara,
+        priorityPara,
+        projectPara
+      );
+      buttonBlock.classList.add("expanded");
+    }
   }
 }

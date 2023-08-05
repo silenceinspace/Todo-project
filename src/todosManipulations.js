@@ -1,4 +1,9 @@
-export { Todo, taskInterface };
+export {
+  Todo,
+  taskInterface,
+  createObjectFromDateInput,
+  getMonthDayYearFormat,
+};
 import { Project } from "./projectManagement";
 // Library to work with dates easier
 import { compareAsc, format } from "date-fns";
@@ -142,7 +147,12 @@ function createObjectFromDateInput(date) {
   return newDateObject;
 }
 
-function getMonthDayYearFormat(date) {
-  const formattedDate = format(date, "MM/dd/yyyy");
+function getMonthDayYearFormat(date, type = "numeric") {
+  let formattedDate;
+  if (type === "numeric") {
+    formattedDate = format(date, "MM/dd/yyyy");
+  } else if (type === "literal") {
+    formattedDate = format(date, "(MMMM d, yyyy)");
+  }
   return formattedDate;
 }
