@@ -4,6 +4,7 @@ export {
   createObjectFromDateInput,
   getMonthDayYearFormat,
 };
+// Extending Project class
 import { Project } from "./projectManagement";
 // Library to work with dates easier
 import { compareAsc, format } from "date-fns";
@@ -22,13 +23,6 @@ class Todo extends Project {
   }
 
   // Updates a task
-  get todoProject() {
-    return this.projectTitle;
-  }
-  set todoProject(value) {
-    this.projectTitle = value;
-  }
-
   get todoTitle() {
     return this.title;
   }
@@ -62,7 +56,7 @@ class Todo extends Project {
 
 // Interface for todos - what functionalities they have
 const taskInterface = {
-  // todos array will modify mainStorage array
+  // Todos array will modify mainStorage array
   todos: [],
   add(todo) {
     this.todos.push(todo);
@@ -77,7 +71,7 @@ const taskInterface = {
   findAll(project) {
     const array = [];
     this.todos.forEach((task) => {
-      if (task.todoProject.toLowerCase() === project.toLowerCase()) {
+      if (task.titleOfProject.toLowerCase() === project.toLowerCase()) {
         array.push(task);
       }
     });
@@ -119,22 +113,14 @@ const taskInterface = {
     return array;
   },
 
-  // update(task, property, task) {
-  //   if (property.toLowerCase() === "title") {
-  //     console.log(`Old title: ${task.todoTitle}`);
-  //     task.todoTitle = task;
-  //     console.log(`Updated title: ${task}`);
-  //   } else if (property.toLowerCase() === "priority") {
-  //     console.log(`Old title: ${task.todoPriority}`);
-  //     task.todoPriority = task;
-  //     console.log(`Updated priority: ${task}`);
-  //   } else if (property.toLowerCase() === "project") {
-  //     console.log(`Old title: ${task.todoProject}`);
-  //     task.todoProject = task;
-  //     console.log(`Updated property: ${task}`);
-  //   }
-  //   console.log(`Full details: "${task.title}" title`);
-  // },
+  editTitle(todoId, newValue) {
+    this.todos.forEach((task) => {
+      if (task.id === todoId) {
+        task.todoTitle = newValue;
+      }
+    });
+    return this.todos;
+  },
 };
 
 // Format a date input and grab individual numbers to use the Date() constructor

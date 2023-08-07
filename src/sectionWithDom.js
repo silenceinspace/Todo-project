@@ -29,12 +29,12 @@ export {
   preventUncheckingTask,
   getIdOfSpecificTask,
   getSiblingElementText,
-  removeProjectBtn,
+  removeProjectOnTheSide,
   closePopup,
   toggleNewProjectInputBlock,
-  setDisplayNone,
+  setDisabledAttribute, // for generateHTML js
+  setDisplayNone, // for generateHTML js
   limitTasksOnDateCategories,
-  selectAllParagraphs,
   hideExpandedDetails,
 };
 
@@ -88,7 +88,7 @@ function openPopup(e) {
     const autoProject = findChosenProject();
     getAutoProjectInput(projectField, autoProject);
   } else {
-    removeDisabledAttr(projectField);
+    removeDisabledAttribute(projectField);
   }
 
   setDisplayBlock(backdropElement);
@@ -128,6 +128,7 @@ function resetProjectFormInput() {
   form.reset();
 }
 
+// Disable refreshing the page while using enter key on an input for a project name
 function disableEnterKeyOnInput(e) {
   if (e.key === "Enter") {
     e.preventDefault();
@@ -139,17 +140,17 @@ function getAutoProjectInput(dropdown, project) {
   for (let i = 0; i < childOptions.length; i++) {
     if (childOptions[i].textContent === project) {
       childOptions[i].setAttribute("selected", "");
-      setDisabledAttr(dropdown);
+      setDisabledAttribute(dropdown);
     }
   }
 }
 
-function setDisabledAttr(elem) {
-  elem.setAttribute("disabled", "");
+function setDisabledAttribute(element) {
+  element.setAttribute("disabled", "");
 }
 
-function removeDisabledAttr(elem) {
-  elem.removeAttribute("disabled");
+function removeDisabledAttribute(element) {
+  element.removeAttribute("disabled");
 }
 
 // Imitate a slow task completion
@@ -211,12 +212,12 @@ function findChosenProject() {
   return title;
 }
 
-function createEventListener(forElem, type, func) {
-  forElem.addEventListener(type, func);
+function createEventListener(forElement, typeOfListener, usedFunction) {
+  forElement.addEventListener(typeOfListener, usedFunction);
 }
 
-function removePreviousTasksFromDOM(elem) {
-  elem.replaceChildren();
+function removePreviousTasksFromDOM(element) {
+  element.replaceChildren();
 }
 
 function highlightProject(value = "inbox") {
@@ -254,6 +255,7 @@ function applyStrikeThroughEffect(e) {
   paragraphs.forEach((para) => (para.style.textDecoration = "line-through"));
 }
 
+// If the task in checked already, it will be gone for good without an option to uncheck it back
 function preventUncheckingTask(e) {
   e.target.disabled = true;
 }
@@ -263,7 +265,7 @@ function getSiblingElementText(element) {
   return title;
 }
 
-function removeProjectBtn(element) {
+function removeProjectOnTheSide(element) {
   element.parentNode.remove();
 }
 
@@ -274,11 +276,18 @@ function closePopup() {
 }
 
 function hideExpandedDetails(button) {
-  const descriptionPara = button.parentNode.querySelector(".task-description");
-  const taskPriority = button.parentNode.querySelector(".task-priority");
-  const taskProject = button.parentNode.querySelector(".task-project");
-  descriptionPara.remove();
-  taskPriority.remove();
-  taskProject.remove();
+  const extraParagraphs = button.parentNode.querySelectorAll("p");
+  extraParagraphs.forEach((para) => {
+    if (para.classList.contains("task-title")) {
+      para.classList.remove("add-more-title-info");
+    } else if (para.classList.contains("task-due-date")) {
+      para.classList.remove("add-more-due-date-info");
+    } else {
+      para.remove();
+    }
+  });
+
   button.classList.remove("expanded");
+  const editButton = button.parentNode.querySelector(".edit-task");
+  editButton.remove();
 }

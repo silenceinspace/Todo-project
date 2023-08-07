@@ -26,13 +26,13 @@ const projectInterface = {
     this.projects = this.projects.filter(
       (proj) => proj.titleOfProject !== project
     );
-
     return this.projects;
   },
 
   removeAssociatedTasks(projectName, storage) {
-    storage = storage.filter((task) => task.todoProject !== projectName);
-
-    return storage;
+    const leftTasks = storage.filter(
+      (task) => task.titleOfProject !== projectName
+    );
+    return leftTasks;
   },
 };

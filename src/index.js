@@ -1,15 +1,16 @@
 import { Todo, taskInterface } from "./todosManipulations";
 import { Project, projectInterface } from "./projectManagement";
-// Import methods
+// Import all DOM functions
 import * as DOMMethods from "./sectionWithDom";
-// Import variables
 import {
+  // Variables
   okButton,
   projectBlock,
   displayNewProject,
-  displayForTasks,
-  createExpandedTextFields,
   createTodoForm,
+  // Functions
+  displayForTasks,
+  createBlocksInExpandedState,
 } from "./generateHTML";
 
 // Import styles
@@ -27,7 +28,6 @@ console.log(projectStorage);
 
 // Cancel/add todo (event delegation)
 DOMMethods.createEventListener(createTodoForm, "click", controlPopupView);
-DOMMethods.createEventListener(createTodoForm, "keydown", controlPopupView);
 
 function getTitleInput() {
   const title = document.querySelector("#for-title").value;
@@ -130,14 +130,14 @@ function createTodo() {
 function controlPopupView(e) {
   const btn = e.target.textContent;
 
-  if (btn === "Cancel" || e.key === "Escape") {
+  if (btn === "Cancel") {
     DOMMethods.closePopup();
-  } else if (btn === "Add" || e.key === "Enter") {
+  } else if (btn === "Add") {
     if (checkInputGeneralRules(getTitleInput())) return;
     if (checkDescriptionInputLimit(getDescriptionInput())) return;
     if (checkDateInput(getDueDateInput())) return;
 
-    createTodo(e);
+    createTodo();
     DOMMethods.closePopup();
   }
 }
@@ -154,7 +154,6 @@ function removeTask(e) {
 
   const task = DOMMethods.findClosestDataAttibute(e);
   const id = DOMMethods.getIdOfSpecificTask(task);
-
   task.remove();
   mainStorage = taskInterface.remove(id);
   console.log(mainStorage);
@@ -179,7 +178,6 @@ function completeTask(e) {
   if (taskStatus) {
     DOMMethods.applyStrikeThroughEffect(e);
     DOMMethods.preventUncheckingTask(e);
-
     const task = DOMMethods.findClosestDataAttibute(e);
     const id = DOMMethods.getIdOfSpecificTask(task);
     slowDownTaskCompleting(task, id);
@@ -214,7 +212,7 @@ function confirmChoice() {
   return warning;
 }
 // Clear array in an object from which I take all info and assign to mainStorage
-function changeArraysInsideExternalInterfaces(projectName) {
+function modifyExternalArray(projectName) {
   taskInterface.todos = projectInterface.removeAssociatedTasks(
     projectName,
     taskInterface.todos
@@ -229,9 +227,9 @@ function removeProject(e) {
   const project = DOMMethods.getSiblingElementText(span);
   const removalIsConfirmed = confirmChoice();
   if (removalIsConfirmed) {
-    changeArraysInsideExternalInterfaces(project);
+    modifyExternalArray(project);
     projectStorage = projectInterface.remove(project);
-    DOMMethods.removeProjectBtn(span);
+    DOMMethods.removeProjectOnTheSide(span);
     // While removing an element from DOM and needing to rerender content, it will automatically go back to inbox project
     DOMMethods.highlightProject();
     DOMMethods.updateTodoDisplay();
@@ -246,6 +244,7 @@ function expandTaskBlock(e) {
   const expandTaskButton = DOMMethods.findClick(e, ".expand-task");
   if (!expandTaskButton) return;
 
+  // Imitate true/false behavior with the element's state. If there is the class, then the value is truthy
   const hasExpandedClass = DOMMethods.findClick(e, ".expanded");
   if (hasExpandedClass) {
     DOMMethods.hideExpandedDetails(expandTaskButton);
@@ -254,23 +253,31 @@ function expandTaskBlock(e) {
 
   const task = DOMMethods.findClosestDataAttibute(e);
   const id = DOMMethods.getIdOfSpecificTask(task);
-  fetchExpandedBlock(expandTaskButton, id, task);
+  createBlocksInExpandedState(mainStorage, expandTaskButton, id, task);
 }
 
-function fetchExpandedBlock(buttonBlock, idBlock, taskBlock) {
-  for (let i = 0; i < mainStorage.length; i++) {
-    if (mainStorage[i].id === idBlock) {
-      const expandedBlock = mainStorage[i];
-      const descriptionPara = expandedBlock.todoDescription;
-      const priorityPara = expandedBlock.todoPriority;
-      const projectPara = expandedBlock.todoProject;
-      createExpandedTextFields(
-        taskBlock,
-        descriptionPara,
-        priorityPara,
-        projectPara
-      );
-      buttonBlock.classList.add("expanded");
-    }
+// Edit todo's info
+DOMMethods.createEventListener(displayForTasks, "click", editTaskTitle);
+function editTaskTitle(e) {
+  const editButton = DOMMethods.findClick(e, ".edit-task");
+  if (!editButton) return;
+
+  const task = DOMMethods.findClosestDataAttibute(e);
+  const id = DOMMethods.getIdOfSpecificTask(task);
+  const currentTitle = task.querySelector(".task-title").textContent;
+  const input = getInputForEditingTitle(currentTitle);
+  mainStorage = taskInterface.editTitle(id, input);
+  DOMMethods.updateTodoDisplay();
+}
+
+function getInputForEditingTitle(existingTitle) {
+  let newTitle = prompt("What is the new titel?", existingTitle);
+  if (newTitle === null) {
+    newTitle = existingTitle;
+    alert("Title stays the same.");
+  } else if (checkInputGeneralRules(newTitle)) {
+    newTitle = existingTitle;
+    alert("Title stays the same.");
   }
+  return newTitle;
 }

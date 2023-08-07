@@ -1,4 +1,4 @@
-import { setDisplayNone } from "./sectionWithDom";
+import { setDisplayNone, setDisabledAttribute } from "./sectionWithDom";
 import {
   createObjectFromDateInput,
   getMonthDayYearFormat,
@@ -10,7 +10,7 @@ export {
   inboxBlock,
   projectBlock,
   displayForTasks,
-  createTodoForm,
+  createTodoForm, // for index js
   createTaskInsideProject,
   createTaskButton,
   createProjectButton,
@@ -19,13 +19,11 @@ export {
   okButton,
   xButton,
   // Export functions
-  createExpandedTextFields,
-  // hideExpandedDetails
-  createDOMElement,
   appendElement,
   createBlocksToRepresentTasks,
   createSelectOption,
-  displayNewProject,
+  createBlocksInExpandedState, // for index js
+  displayNewProject, // for index js
 };
 
 ////////////////////////////
@@ -102,16 +100,18 @@ appendElement(projectFormParagraph, xButton);
 appendElement(projectFormParagraph, okButton);
 
 ////////////////////////////
-// Add minor changes to DOM ELEMENTS //
+// Add minor changes to initial DOM ELEMENTS //
 ////////////////////////////
-inbox.disabled = true;
-inbox.classList.add("project");
-today.classList.add("project");
-upcoming.classList.add("project");
-xButton.setAttribute("type", "button");
-okButton.setAttribute("type", "button");
-closePopupMenuButton.setAttribute("type", "button");
-addTodoButton.setAttribute("type", "button");
+setDisabledAttribute(inbox);
+addClass(inbox, "project");
+addClass(today, "project");
+addClass(upcoming, "project");
+addAttribute(xButton, "type", "button");
+addAttribute(okButton, "type", "button");
+addAttribute(closePopupMenuButton, "type", "button");
+addAttribute(closePopupMenuButton, "tabindex", 7);
+addAttribute(addTodoButton, "type", "button");
+addAttribute(addTodoButton, "tabindex", 6);
 setDisplayNone(createProjectForm);
 setDisplayNone(backdropElement);
 
@@ -128,6 +128,7 @@ setDisplayNone(backdropElement);
     if (i === 0) {
       label = createLabel("for-title", "Title:");
       input = createInputElem("text", "todo-title", "for-title", "Groceries");
+      addAttribute(input, "tabindex", i + 1);
     } else if (i === 1) {
       label = createLabel("for-description", "Description:");
       input = createInputElem(
@@ -136,6 +137,7 @@ setDisplayNone(backdropElement);
         "for-description",
         "Buy eggs, meat, vegetables..."
       );
+      addAttribute(input, "tabindex", i + 1);
     } else if (i === 2) {
       label = createLabel("for-due-date", "Due date:");
       input = createInputElem(
@@ -144,6 +146,7 @@ setDisplayNone(backdropElement);
         "for-due-date",
         "01/01/2020"
       );
+      addAttribute(input, "tabindex", i + 1);
     } else if (i === 3) {
       label = createLabel("for-priority", "Priority:");
       input = createSelectBox("for-priority", "priorities");
@@ -155,9 +158,11 @@ setDisplayNone(backdropElement);
       appendElement(input, onePriority);
       appendElement(input, twoPriority);
       appendElement(input, threePriority);
+      addAttribute(input, "tabindex", i + 1);
     } else if (i === 4) {
       label = createLabel("for-project", "Project:");
       input = createSelectBox("for-project", "projects");
+      addAttribute(input, "tabindex", i + 1);
     }
     appendElement(para, label);
     appendElement(para, input);
@@ -179,6 +184,7 @@ function createBlocksToRepresentTasks(project) {
     const expandButton = createDOMElement("button", "expand-task", "...");
     const checkList = createDOMElement("input", "check-box", "");
     const titlePara = project[i].todoTitle;
+    // Use date-fns library to convert a value from a date input to words
     let dueDatePara = createObjectFromDateInput(project[i].todoDueDate);
     dueDatePara = getMonthDayYearFormat(dueDatePara, "literal");
     const priorityPara = project[i].todoPriority;
@@ -186,8 +192,9 @@ function createBlocksToRepresentTasks(project) {
     appendElement(taskDiv, removeButton);
     appendElement(taskDiv, expandButton);
     appendElement(taskDiv, checkList);
-    taskDiv.setAttribute("data-id", project[i].id);
-    checkList.setAttribute("type", "checkbox");
+    // Add a data attribute to navigate to a needed todo object easier
+    addAttribute(taskDiv, "data-id", project[i].id);
+    addAttribute(checkList, "type", "checkbox");
 
     setColorOnChecklist(priorityPara, checkList);
 
@@ -209,40 +216,84 @@ function setColorOnChecklist(priorityLevel, element) {
 }
 
 function createDefaultTextFields(div, title, dueDate) {
-  const textForTitle = createDOMElement("p", "task-title", `Title: ${title}`);
-  const textForDueDate = createDOMElement("p", "task-dueDate", `Due date: ${dueDate}`);
+  const textForTitle = createDOMElement("p", "task-title", title);
+  const textForDueDate = createDOMElement("p", "task-due-date", dueDate);
 
   appendElement(div, textForTitle);
   appendElement(div, textForDueDate);
 }
 
+function createBlocksInExpandedState(storageArray, button, id, task) {
+  for (let i = 0; i < storageArray.length; i++) {
+    if (storageArray[i].id === id) {
+      const expandedBlock = storageArray[i];
+      const descriptionPara = expandedBlock.todoDescription;
+      const priorityPara = expandedBlock.todoPriority;
+      const projectPara = expandedBlock.titleOfProject;
+      // Catch title and due date paragraphs to add a pseudo element to them
+      const titlePara = task.querySelector(".task-title");
+      const dueDatePara = task.querySelector(".task-due-date");
+      const editTask = createDOMElement("button", "edit-task", "Edit title");
+
+      createExpandedTextFields(
+        task,
+        descriptionPara,
+        priorityPara,
+        projectPara,
+        editTask
+      );
+
+      // Insert pseudo element "::before" to imitate a more detailed view of the task's properties
+      addClass(dueDatePara, "add-more-due-date-info");
+      addClass(titlePara, "add-more-title-info");
+      addClass(button, "expanded");
+    }
+  }
+}
+
 // expand a todo
-function createExpandedTextFields(div, description, priority, project) {
+function createExpandedTextFields(
+  div,
+  description,
+  priority,
+  project,
+  editButton
+) {
   const textForDescription = createDOMElement(
     "p",
     "task-description",
     `Description: ${description}`
   );
-  const textForPriority = createDOMElement("p", "task-priority", `Priority: ${priority}`);
-  const textForProject = createDOMElement("p", "task-project", `Project: ${project}`);
+  const textForPriority = createDOMElement(
+    "p",
+    "task-priority",
+    `Priority: ${priority}`
+  );
+  const textForProject = createDOMElement(
+    "p",
+    "task-project",
+    `Project: ${project}`
+  );
   appendElement(div, textForDescription);
   appendElement(div, textForPriority);
   appendElement(div, textForProject);
+  appendElement(div, editButton);
 }
 
 function displayNewProject(value) {
   const div = createDOMElement("div", "project-title-div", "");
   const btn = createDOMElement("button", "custom-project-btn", value);
-  btn.classList.add("project");
+  addClass(btn, "project");
   const span = createDOMElement("span", "remove-project-btn", "X");
   appendElement(div, btn);
   appendElement(div, span);
   appendElement(projectBlock, div);
 }
 
+// Functions to create common pieces
 function createDOMElement(elementName, className, text) {
   const elem = document.createElement(elementName);
-  elem.classList.add(className);
+  addClass(elem, className);
   elem.textContent = text;
   return elem;
 }
@@ -251,32 +302,40 @@ function appendElement(parent, child) {
   parent.append(child);
 }
 
-function createLabel(forAttribute, labelText) {
+function createLabel(forAttibuteValue, labelText) {
   const label = document.createElement("label");
-  label.setAttribute("for", forAttribute);
+  addAttribute(label, "for", forAttibuteValue);
   label.textContent = labelText;
   return label;
 }
 
 function createInputElem(inputType, nameAttribute, inputId, hintText) {
   const input = document.createElement("input");
-  input.setAttribute("type", inputType);
-  input.setAttribute("name", nameAttribute);
-  input.setAttribute("id", inputId);
-  input.setAttribute("placeholder", hintText);
+  addAttribute(input, "type", inputType);
+  addAttribute(input, "name", nameAttribute);
+  addAttribute(input, "id", inputId);
+  addAttribute(input, "placeholder", hintText);
   return input;
 }
 
 function createSelectBox(selectId, selectName) {
   const select = document.createElement("select");
-  select.setAttribute("id", selectId);
-  select.setAttribute("name", selectName);
+  addAttribute(select, "id", selectId);
+  addAttribute(select, "name", selectName);
   return select;
 }
 
 function createSelectOption(optionValue, optionText) {
   const option = document.createElement("option");
-  option.setAttribute("value", optionValue);
+  addAttribute(option, "value", optionValue);
   option.textContent = optionText;
   return option;
+}
+
+function addAttribute(element, attributeName, attributeValue) {
+  element.setAttribute(attributeName, attributeValue);
+}
+
+function addClass(element, className) {
+  element.classList.add(className);
 }
