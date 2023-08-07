@@ -4,10 +4,10 @@ import { Project, projectInterface } from "./projectManagement";
 import * as DOMMethods from "./sectionWithDom";
 import {
   // Variables
-  okButton,
+  acceptButton,
   projectBlock,
   displayNewProject,
-  createTodoForm,
+  formForCreatingTodo,
   // Functions
   displayForTasks,
   createBlocksInExpandedState,
@@ -27,7 +27,7 @@ console.log("Project storage:");
 console.log(projectStorage);
 
 // Cancel/add todo (event delegation)
-DOMMethods.createEventListener(createTodoForm, "click", controlPopupView);
+DOMMethods.createEventListener(formForCreatingTodo, "click", controlPopupView);
 
 function getTitleInput() {
   const title = document.querySelector("#for-title").value;
@@ -145,7 +145,7 @@ function controlPopupView(e) {
 // Remove a task
 DOMMethods.createEventListener(displayForTasks, "click", removeTask);
 function removeTask(e) {
-  const removeTaskButton = DOMMethods.findClick(e, ".remove-task");
+  const removeTaskButton = DOMMethods.findClick(e, ".remove-task-btn");
   if (!removeTaskButton) return;
 
   // Not allow removing tasks in today/upcoming categories
@@ -185,7 +185,7 @@ function completeTask(e) {
 }
 
 // Create a project
-DOMMethods.createEventListener(okButton, "click", createProject);
+DOMMethods.createEventListener(acceptButton, "click", createProject);
 function getNewProjectTitle() {
   const title = document.querySelector("#for-new-project").value.toLowerCase();
   return title;
@@ -241,7 +241,7 @@ function removeProject(e) {
 // Expand todo's info
 DOMMethods.createEventListener(displayForTasks, "click", expandTaskBlock);
 function expandTaskBlock(e) {
-  const expandTaskButton = DOMMethods.findClick(e, ".expand-task");
+  const expandTaskButton = DOMMethods.findClick(e, ".expand-task-btn");
   if (!expandTaskButton) return;
 
   // Imitate true/false behavior with the element's state. If there is the class, then the value is truthy
@@ -259,7 +259,7 @@ function expandTaskBlock(e) {
 // Edit todo's info
 DOMMethods.createEventListener(displayForTasks, "click", editTaskTitle);
 function editTaskTitle(e) {
-  const editButton = DOMMethods.findClick(e, ".edit-task");
+  const editButton = DOMMethods.findClick(e, ".edit-title-btn");
   if (!editButton) return;
 
   const task = DOMMethods.findClosestDataAttibute(e);

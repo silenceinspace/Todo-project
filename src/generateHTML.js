@@ -10,14 +10,14 @@ export {
   inboxBlock,
   projectBlock,
   displayForTasks,
-  createTodoForm, // for index js
+  formForCreatingTodo, // for index js
   createTaskInsideProject,
   createTaskButton,
   createProjectButton,
   newProjectInput,
   backdropElement,
-  okButton,
-  xButton,
+  acceptButton,
+  cancelButton,
   // Export functions
   appendElement,
   createBlocksToRepresentTasks,
@@ -37,29 +37,37 @@ const content = document.querySelector("#content");
 const inboxBlock = createDOMElement("div", "inbox-div", "");
 const projectBlock = createDOMElement("div", "project-div", "");
 const projectHeading = createDOMElement("div", "project-heading", "PROJECTS:");
-const today = createDOMElement("button", "button-today", "today");
+const today = createDOMElement("button", "today", "today");
 const todoBlock = createDOMElement("div", "todo-div", "");
-const inbox = createDOMElement("button", "button-inbox", "inbox");
-const upcoming = createDOMElement("button", "button-upcoming", "upcoming");
+const inbox = createDOMElement("button", "inbox", "inbox");
+const upcoming = createDOMElement("button", "upcoming", "upcoming");
 const createTaskButton = createDOMElement(
   "button",
-  "create-tasks",
+  "create-tasks-btn",
   "Create task"
 );
 const createProjectButton = createDOMElement(
   "button",
-  "create-projects",
+  "create-projects-btn",
   "Create project"
 );
-const displayForTasks = createDOMElement("div", "display-tasks", "");
+const displayForTasks = createDOMElement("div", "display-for-tasks", "");
 const createTaskInsideProject = createDOMElement(
   "button",
   "create-task-directly",
   "+"
 );
 const backdropElement = createDOMElement("div", "backdrop", "");
-const createTodoForm = createDOMElement("form", "create-todo-form", "");
-const createProjectForm = createDOMElement("form", "create-project-form", "");
+const formForCreatingTodo = createDOMElement(
+  "form",
+  "form-for-creating-todo",
+  ""
+);
+const formForCreatingProject = createDOMElement(
+  "form",
+  "form-for-creating-project",
+  ""
+);
 const projectFormParagraph = createDOMElement("p", "popup-menu", "");
 const newProjectInput = createInputElem(
   "text",
@@ -67,10 +75,18 @@ const newProjectInput = createInputElem(
   "for-new-project",
   "Project title..."
 );
-const okButton = createDOMElement("button", "new-project-button-ok", "OK");
-const xButton = createDOMElement("button", "new-project-button-x", "X");
+const acceptButton = createDOMElement(
+  "button",
+  "new-project-button-accept",
+  "OK"
+);
+const cancelButton = createDOMElement(
+  "button",
+  "new-project-button-cancel",
+  "X"
+);
 const divWithButtonsInPopup = createDOMElement("div", "control-popup-div", "");
-const addTodoButton = createDOMElement("button", "create-tasks", "Add");
+const addTodoButton = createDOMElement("button", "initialize-task", "Add");
 const closePopupMenuButton = createDOMElement(
   "button",
   "close-popup",
@@ -92,12 +108,12 @@ appendElement(todoBlock, createProjectButton);
 appendElement(todoBlock, displayForTasks);
 appendElement(todoBlock, createTaskInsideProject);
 appendElement(document.body, backdropElement);
-appendElement(backdropElement, createTodoForm);
-appendElement(todoBlock, createProjectForm);
-appendElement(createProjectForm, projectFormParagraph);
+appendElement(backdropElement, formForCreatingTodo);
+appendElement(todoBlock, formForCreatingProject);
+appendElement(formForCreatingProject, projectFormParagraph);
 appendElement(projectFormParagraph, newProjectInput);
-appendElement(projectFormParagraph, xButton);
-appendElement(projectFormParagraph, okButton);
+appendElement(projectFormParagraph, cancelButton);
+appendElement(projectFormParagraph, acceptButton);
 
 ////////////////////////////
 // Add minor changes to initial DOM ELEMENTS //
@@ -106,13 +122,13 @@ setDisabledAttribute(inbox);
 addClass(inbox, "project");
 addClass(today, "project");
 addClass(upcoming, "project");
-addAttribute(xButton, "type", "button");
-addAttribute(okButton, "type", "button");
+addAttribute(cancelButton, "type", "button");
+addAttribute(acceptButton, "type", "button");
 addAttribute(closePopupMenuButton, "type", "button");
 addAttribute(closePopupMenuButton, "tabindex", 7);
 addAttribute(addTodoButton, "type", "button");
 addAttribute(addTodoButton, "tabindex", 6);
-setDisplayNone(createProjectForm);
+setDisplayNone(formForCreatingProject);
 setDisplayNone(backdropElement);
 
 ////////////////////////////
@@ -121,7 +137,7 @@ setDisplayNone(backdropElement);
 (function createInputFields() {
   for (let i = 0; i < 5; i++) {
     const para = createDOMElement("p", "popup-menu", "");
-    appendElement(createTodoForm, para);
+    appendElement(formForCreatingTodo, para);
 
     let label;
     let input;
@@ -169,7 +185,7 @@ setDisplayNone(backdropElement);
   }
 
   // Place control buttons below input fields in the popup menu
-  appendElement(createTodoForm, divWithButtonsInPopup);
+  appendElement(formForCreatingTodo, divWithButtonsInPopup);
   appendElement(divWithButtonsInPopup, closePopupMenuButton);
   appendElement(divWithButtonsInPopup, addTodoButton);
 })();
@@ -180,8 +196,8 @@ setDisplayNone(backdropElement);
 function createBlocksToRepresentTasks(project) {
   for (let i = 0; i < project.length; i++) {
     const taskDiv = createDOMElement("div", "task-div", "");
-    const removeButton = createDOMElement("button", "remove-task", "X");
-    const expandButton = createDOMElement("button", "expand-task", "...");
+    const removeButton = createDOMElement("button", "remove-task-btn", "X");
+    const expandButton = createDOMElement("button", "expand-task-btn", "...");
     const checkList = createDOMElement("input", "check-box", "");
     const titlePara = project[i].todoTitle;
     // Use date-fns library to convert a value from a date input to words
@@ -233,14 +249,14 @@ function createBlocksInExpandedState(storageArray, button, id, task) {
       // Catch title and due date paragraphs to add a pseudo element to them
       const titlePara = task.querySelector(".task-title");
       const dueDatePara = task.querySelector(".task-due-date");
-      const editTask = createDOMElement("button", "edit-task", "Edit title");
+      const editTitle = createDOMElement("button", "edit-title-btn", "Edit title");
 
       createExpandedTextFields(
         task,
         descriptionPara,
         priorityPara,
         projectPara,
-        editTask
+        editTitle
       );
 
       // Insert pseudo element "::before" to imitate a more detailed view of the task's properties
@@ -282,7 +298,7 @@ function createExpandedTextFields(
 
 function displayNewProject(value) {
   const div = createDOMElement("div", "project-title-div", "");
-  const btn = createDOMElement("button", "custom-project-btn", value);
+  const btn = createDOMElement("button", "custom-project", value);
   addClass(btn, "project");
   const span = createDOMElement("span", "remove-project-btn", "X");
   appendElement(div, btn);

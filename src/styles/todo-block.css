@@ -15,7 +15,7 @@
     margin: 10px;
   }
 
-  & .create-project-form {
+  & .form-for-creating-project {
     position: absolute;
     width: 240px;
     height: 32.4px;
@@ -39,7 +39,7 @@
     margin: 10px auto;
   }
 
-  & .display-tasks {
+  & .display-for-tasks {
     border-top: solid 5px purple;
     display: grid;
     /* Expanded todos can take up space and free it up back and forth */
@@ -66,7 +66,7 @@
         content: "Due date: ";
       }
 
-      & .remove-task {
+      & .remove-task-btn {
         padding: 5px 8px;
         position: absolute;
         top: 10px;
@@ -80,7 +80,7 @@
         border-radius: 5px;
       }
 
-      & .expand-task {
+      & .expand-task-btn {
         padding: 5px 8px;
         position: absolute;
         top: 10px;
@@ -98,7 +98,7 @@
         background-color: green;
       }
 
-      & .edit-task {
+      & .edit-title-btn {
         padding: 5px 10px;
         font-weight: bold;
         font-size: 1.3rem;

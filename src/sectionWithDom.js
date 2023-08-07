@@ -11,7 +11,7 @@ import {
   createProjectButton,
   newProjectInput,
   backdropElement,
-  xButton,
+  cancelButton,
   // Import functions
   appendElement,
   createBlocksToRepresentTasks,
@@ -46,13 +46,13 @@ createEventListener(inboxBlock, "click", displayTasksInThisProject);
 createEventListener(createTaskInsideProject, "click", openPopup);
 createEventListener(createTaskButton, "click", openPopup);
 createEventListener(createProjectButton, "click", toggleNewProjectInputBlock);
-createEventListener(xButton, "click", toggleNewProjectInputBlock);
+createEventListener(cancelButton, "click", toggleNewProjectInputBlock);
 createEventListener(newProjectInput, "keydown", disableEnterKeyOnInput);
 
 ////////////////////////////
 // Functions //
 ////////////////////////////
-const projectForm = document.querySelector(".create-project-form");
+const projectForm = document.querySelector(".form-for-creating-project");
 function toggleNewProjectInputBlock() {
   if (projectForm.style.display === "none") {
     setDisplayBlock(projectForm);
@@ -119,12 +119,12 @@ function setDisplayBlock(block) {
 }
 
 function resetTaskFormInputs() {
-  const form = document.querySelector("form.create-todo-form");
+  const form = document.querySelector("form.form-for-creating-todo");
   form.reset();
 }
 
 function resetProjectFormInput() {
-  const form = document.querySelector("form.create-project-form");
+  const form = document.querySelector("form.form-for-creating-project");
   form.reset();
 }
 
