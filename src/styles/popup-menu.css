@@ -25,16 +25,42 @@
     display: grid;
     grid-template-columns: 150px 500px;
 
-    & input {
-      height: 40px;
-      padding: 10px 20px;
-      font-size: 1.7rem;
-    }
-
     & label {
-      font-size: 1.5rem;
+      align-self: center;
+      font-size: 1.7rem;
       font-style: italic;
       font-weight: bold;
+    }
+
+    & input {
+      height: 40px;
+      padding: 10px;
+      font-size: 1.5rem;
+      appearance: none;
+      border: none;
+      border-radius: 15px;
+    }
+
+    & select {
+      height: 40px;
+      padding-left: 10px;
+      border-radius: 15px;
+    }
+
+    & input:focus,
+    select:focus {
+      outline: none;
+      border: 3px solid purple;
+    }
+
+    & input:focus,
+    select:hover {
+      cursor: pointer;
+    }
+
+    & select:disabled {
+      font-size: 1.4rem;
+      color: purple;
     }
   }
 
@@ -51,19 +77,19 @@
       color: white;
       border: none;
       border-radius: 10px;
-
-      &:hover {
-        color: black;
-        text-decoration: underline;
-        cursor: pointer;
-      }
     }
 
-    & .close-popup {
+    & button:hover {
+      color: black;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    & button.close-popup {
       background-color: rgb(151, 51, 51);
     }
 
-    & .initialize-task {
+    & button.initialize-task {
       background-color: rgb(0, 255, 0);
     }
   }

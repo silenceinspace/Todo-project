@@ -211,7 +211,6 @@ function findClick(e, value) {
 
 function findChosenProject() {
   const title = document.querySelector("button.project[disabled]").textContent;
-  console.log(title);
   return title;
 }
 

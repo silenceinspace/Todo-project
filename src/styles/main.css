@@ -14,19 +14,17 @@ body {
   grid-template-columns: 200px 700px;
   grid-template-rows: 60px 120px minmax(300px, 1fr);
   margin: 50px 100px;
-  width: 904px;
-  border: 2px solid;
+  width: 900px;
 
-  & button:hover {
+  & button.project:hover {
     text-decoration: underline;
     cursor: pointer;
-    color: goldenrod;
   }
 
   & button.project {
     font-size: 1.3rem;
     font-weight: bold;
-    color: skyblue;
+    color: white;
     background-color: inherit;
     border: none;
   }
@@ -48,9 +46,11 @@ body {
   padding: 10px 30px;
   letter-spacing: 10px;
   background-color: rgb(136, 136, 136);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
   position: relative;
 
-  & .create-tasks-btn {
+  & button.create-tasks-btn {
     position: absolute;
     top: 10px;
     left: 220px;
@@ -59,8 +59,13 @@ body {
     font-weight: bold;
     background-color: purple;
     color: white;
-    border: none;
+    border: 2px solid purple;
     border-radius: 10px;
+  }
+
+  & button.create-tasks-btn:hover {
+    cursor: pointer;
+    border: 2px solid white;
   }
 }
 
@@ -108,51 +113,85 @@ body {
   width: 200px;
   grid-auto-rows: 40px;
   background-color: rgb(153, 146, 146);
+  border-bottom-left-radius: 20px;
 
-  & .project-heading {
+  & div.project-heading {
     font-size: 1.8rem;
     font-weight: bold;
     text-align: center;
     position: relative;
 
-    & .create-projects-span {
+    & span.create-projects-span {
       margin-left: 5px;
       padding: 0 5px;
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       border-radius: 10px;
-      color: gold;
-      background-color: grey;
-      border: gold 2px solid;
+      background-color: purple;
+      color: white;
+      border: 2px solid purple;
     }
 
-    & .create-projects-span:hover {
+    & span.create-projects-span:hover {
       cursor: pointer;
-      color: white;
       border: white 2px solid;
     }
 
-    & .form-for-creating-project {
+    & form.form-for-creating-project {
       position: absolute;
       width: 200px;
       height: 40px;
       top: 0;
       left: 0;
       padding: 5px 10px;
-      background-color: white;
-      color: black;
+      background-color: black;
 
       & p {
         display: grid;
         grid-template-columns: 110px 25px 25px;
         gap: 10px;
+      }
+
+      & p input {
+        padding: 2px 5px;
         font-size: 1.2rem;
+        border: 2px solid;
+        appearance: none;
+      }
+
+      & p input:hover {
+        cursor: pointer;
+      }
+
+      & p input:focus {
+        outline: none;
+        border-color: purple;
+      }
+
+      & p button {
+        border: none;
+        border-radius: 10px;
+        font-size: 1.2rem;
+        background-color: white;
+      }
+
+      & p button:hover {
+        cursor: pointer;
+        background-color: purple;
+      }
+
+      & p .new-project-button-cancel {
+        color: red;
+      }
+
+      & p .new-project-button-accept {
+        color: green;
       }
     }
   }
 
   & div:not(.project-heading) {
     display: grid;
-    grid-template-columns: 50px 120px 30px;
+    grid-template-columns: 50px 110px 30px;
     justify-items: start;
 
     & img {
@@ -165,19 +204,22 @@ body {
 
     & button {
       grid-column: 2/3;
+      justify-self: start;
+      overflow: hidden;
     }
 
     & span {
       grid-column: 3/4;
-      font-size: 2rem;
+      place-self: center;
+      font-size: 1.8rem;
       text-align: center;
       font-weight: bold;
-      color: black;
+      color: white;
+    }
 
-      &:hover {
-        cursor: pointer;
-        color: red;
-      }
+    & span:hover {
+      cursor: pointer;
+      color: red;
     }
   }
 }

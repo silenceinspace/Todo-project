@@ -83,7 +83,7 @@ const newProjectInput = createInputElem(
 const acceptButton = createDOMElement(
   "button",
   "new-project-button-accept",
-  "OK"
+  "✔"
 );
 const cancelButton = createDOMElement(
   "button",
@@ -174,7 +174,7 @@ setDisplayNone(backdropElement);
         "date",
         "todo-due-date",
         "for-due-date",
-        "01/01/2020"
+        "01/01/2021"
       );
       addAttribute(input, "tabindex", i + 1);
     } else if (i === 3) {

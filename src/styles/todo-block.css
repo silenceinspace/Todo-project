@@ -3,15 +3,16 @@
   grid-row: 2/4;
   position: relative;
   background-color: rgb(170, 162, 162);
+  border-bottom-right-radius: 20px;
 
-  & .current-list-name {
+  & div.current-list-name {
     padding: 5px 30px 0 30px;
     font-size: 2rem;
     font-weight: bold;
     color: white;
   }
 
-  & .create-task-directly {
+  & button.create-task-directly {
     display: block;
     margin: 10px auto;
     padding: 5px 10px;
@@ -23,87 +24,88 @@
     color: white;
   }
 
-  & .create-task-directly:hover {
+  & button.create-task-directly:hover {
     border: 2px solid white;
+    cursor: pointer;
   }
 
-  & .display-for-tasks {
+  & div.display-for-tasks {
     display: grid;
     /* Expanded todos can take up space and free it up back and forth */
     grid-template-columns: 1fr;
     grid-auto-rows: min-content;
 
-    & .task-div {
-      padding: 10px 20px 10px 45px;
-      font-size: 1.3rem;
+    & div.task-div {
+      padding: 10px 60px 10px 80px;
+      font-size: 1.4rem;
       font-style: italic;
+      font-weight: bold;
       border-bottom: 2px solid black;
       position: relative;
 
-      & .task-due-date {
-        color: orange;
-        font-weight: bold;
+      & button:hover {
+        cursor: pointer;
       }
 
-      & .add-more-title-info::before {
-        content: "Title: ";
-      }
-
-      & .add-more-due-date-info::before {
-        content: "Due date: ";
-      }
-
-      & .remove-task-btn {
-        padding: 5px 8px;
-        position: absolute;
-        top: 10px;
-        right: 20px;
-
-        color: white;
-        font-size: 1.2rem;
-        font-weight: bold;
-        background-color: goldenrod;
-        border: none;
-        border-radius: 5px;
-      }
-
-      & .expand-task-btn {
+      & button.remove-task-btn {
         padding: 5px 8px;
         position: absolute;
         top: 10px;
         right: 60px;
+        width: 35px;
+        height: 35px;
+
+        color: white;
+        font-size: 1.2rem;
+        font-weight: bold;
+        background-color: red;
+        border: none;
+        border-radius: 10px;
+      }
+
+      & button.expand-task-btn {
+        padding: 5px 8px;
+        position: absolute;
+        top: 10px;
+        right: 110px;
+        width: 35px;
+        height: 35px;
 
         color: white;
         font-size: 1.2rem;
         font-weight: bold;
         background-color: blue;
         border: none;
-        border-radius: 5px;
+        border-radius: 10px;
       }
 
-      & .expanded {
-        background-color: green;
-      }
-
-      & .edit-title-btn {
+      & button.edit-title-btn {
+        position: absolute;
+        top: 65px;
+        right: 60px;
         padding: 5px 10px;
         font-weight: bold;
         font-size: 1.3rem;
-        position: absolute;
-        top: 50px;
-        right: 20px;
+        border-radius: 10px;
+        border: 2px solid purple;
+        background-color: purple;
+        color: white;
       }
 
-      & .editable:hover {
+      & button.edit-title-btn:hover {
+        border: 2px solid white;
+      }
+
+      & button.editable:hover {
         color: red;
         cursor: pointer;
         text-decoration: underline;
       }
 
-      & .check-box {
+      & input.check-box {
         position: absolute;
         top: 10px;
-        left: 10px;
+        left: 40px;
         height: 25px;
         width: 25px;
 
@@ -111,18 +113,26 @@
         border-radius: 15px;
         background-color: grey;
         border: 3px solid black;
-
-        &:hover::before {
-          content: "✔";
-          color: white;
-          cursor: pointer;
-
-          position: absolute;
-          bottom: -7px;
-          left: 0px;
-          font-size: 1.7rem;
-        }
       }
+
+      & input.check-box:hover::before {
+        content: "✔";
+        color: white;
+        cursor: pointer;
+
+        position: absolute;
+        bottom: -7px;
+        left: 0px;
+        font-size: 1.7rem;
+      }
+    }
+
+    & p.add-more-title-info::before {
+      content: "Title: ";
+    }
+
+    & p.add-more-due-date-info::before {
+      content: "Due date: ";
     }
   }
 }
