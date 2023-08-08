@@ -5,7 +5,7 @@
 }
 
 body {
-  min-height: 100vh;
+  /* min-height: 100vh; */
   background-color: darkcyan;
 }
 
@@ -13,7 +13,7 @@ body {
   display: grid;
   grid-template-columns: 200px 700px;
   grid-template-rows: 60px 120px minmax(300px, 1fr);
-  margin: 50px 100px;
+  margin: 50px auto;
   width: 900px;
 
   & button.project:hover {

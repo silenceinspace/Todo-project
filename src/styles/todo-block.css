@@ -31,9 +31,22 @@
 
   & div.display-for-tasks {
     display: grid;
-    /* Expanded todos can take up space and free it up back and forth */
     grid-template-columns: 1fr;
+    /* Expanded todos can take up space and free it up back and forth */
     grid-auto-rows: min-content;
+
+    & p {
+      width: 450px;
+      overflow: hidden;
+    }
+
+    & p.add-more-title-info::before {
+      content: "Title: ";
+    }
+
+    & p.add-more-due-date-info::before {
+      content: "Due date: ";
+    }
 
     & div.task-div {
       padding: 10px 60px 10px 80px;
@@ -47,36 +60,28 @@
         cursor: pointer;
       }
 
-      & button.remove-task-btn {
+      & button.remove-task-btn,
+      & button.expand-task-btn {
         padding: 5px 8px;
         position: absolute;
-        top: 10px;
-        right: 60px;
         width: 35px;
         height: 35px;
 
         color: white;
         font-size: 1.2rem;
         font-weight: bold;
-        background-color: red;
         border: none;
         border-radius: 10px;
       }
 
-      & button.expand-task-btn {
-        padding: 5px 8px;
-        position: absolute;
-        top: 10px;
-        right: 110px;
-        width: 35px;
-        height: 35px;
+      & button.remove-task-btn {
+        right: 60px;
+        background-color: red;
+      }
 
-        color: white;
-        font-size: 1.2rem;
-        font-weight: bold;
+      & button.expand-task-btn {
+        right: 110px;
         background-color: blue;
-        border: none;
-        border-radius: 10px;
       }
 
       & button.edit-title-btn {
@@ -94,12 +99,6 @@
 
       & button.edit-title-btn:hover {
         border: 2px solid white;
-      }
-
-      & button.editable:hover {
-        color: red;
-        cursor: pointer;
-        text-decoration: underline;
       }
 
       & input.check-box {
@@ -125,14 +124,6 @@
         left: 0px;
         font-size: 1.7rem;
       }
-    }
-
-    & p.add-more-title-info::before {
-      content: "Title: ";
-    }
-
-    & p.add-more-due-date-info::before {
-      content: "Due date: ";
     }
   }
 }
