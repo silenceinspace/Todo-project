@@ -9,106 +9,174 @@ body {
   background-color: darkcyan;
 }
 
-.display-none {
-  display: none;
-}
-
-.display-block {
-  display: block;
-}
-
 #content {
-  padding: 50px 20px;
-  width: 1000px;
   display: grid;
-  grid-template-columns: 300px 900px;
-  grid-template-rows: 150px minmax(300px, 1fr);
+  grid-template-columns: 200px 700px;
+  grid-template-rows: 60px 120px minmax(300px, 1fr);
+  margin: 50px 100px;
+  width: 904px;
+  border: 2px solid;
 
   & button:hover {
     text-decoration: underline;
     cursor: pointer;
-    color: red;
+    color: goldenrod;
   }
 
-  & button:disabled {
-    background-color: black;
-    color: grey;
+  & button.project {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: skyblue;
+    background-color: inherit;
+    border: none;
   }
 
-  & button:disabled:hover {
+  & button.project:disabled {
+    font-style: italic;
+    text-decoration: underline;
+    color: purple;
+  }
+
+  & button.project:disabled:hover {
     cursor: default;
-    text-decoration: none;
+  }
+}
+
+.app-title-div {
+  grid-row: 1/2;
+  grid-column: 1/3;
+  padding: 10px 30px;
+  letter-spacing: 10px;
+  background-color: rgb(136, 136, 136);
+  position: relative;
+
+  & .create-tasks-btn {
+    position: absolute;
+    top: 10px;
+    left: 220px;
+    padding: 5px 10px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    background-color: purple;
+    color: white;
+    border: none;
+    border-radius: 10px;
   }
 }
 
 /* inbox-today-upcoming block */
 .inbox-div {
-  grid-row: 1/2;
+  grid-row: 2/3;
   grid-column: 1/2;
 
   display: grid;
-  grid-template-rows: 40px;
-  gap: 15px;
+  grid-template-columns: 50px 150px;
+  grid-template-rows: repeat(3, 40px);
+  justify-items: start;
+  background-color: rgb(153, 146, 146);
 
-  border: blue 2px solid;
+  & img {
+    grid-column: 1/2;
+    filter: invert(80%);
+    width: 30px;
+    height: 30px;
+    place-self: center;
+  }
+
+  & img.inbox-svg {
+    grid-row: 1/2;
+  }
+
+  & img.today-svg {
+    grid-row: 2/3;
+  }
+
+  & img.upcoming-svg {
+    grid-row: 3/4;
+  }
 
   & button {
-    font-size: 1.2rem;
-    font-weight: bold;
-
-    background-color: white;
-    color: orange;
-    border: none;
+    grid-column: 2/3;
   }
 }
 
 /* New projects block */
 .project-div {
   grid-column: 1/2;
-  grid-row: 2/3;
-  margin-top: 10px;
-
-  width: 300px;
+  grid-row: 3/4;
   display: grid;
+  width: 200px;
   grid-auto-rows: 40px;
-  gap: 10px;
-
-  border: green solid 2px;
+  background-color: rgb(153, 146, 146);
 
   & .project-heading {
-    background-color: seagreen;
-    border: 2px solid white;
-    color: white;
     font-size: 1.8rem;
     font-weight: bold;
     text-align: center;
+    position: relative;
+
+    & .create-projects-span {
+      margin-left: 5px;
+      padding: 0 5px;
+      font-size: 1.5rem;
+      border-radius: 10px;
+      color: gold;
+      background-color: grey;
+      border: gold 2px solid;
+    }
+
+    & .create-projects-span:hover {
+      cursor: pointer;
+      color: white;
+      border: white 2px solid;
+    }
+
+    & .form-for-creating-project {
+      position: absolute;
+      width: 200px;
+      height: 40px;
+      top: 0;
+      left: 0;
+      padding: 5px 10px;
+      background-color: white;
+      color: black;
+
+      & p {
+        display: grid;
+        grid-template-columns: 110px 25px 25px;
+        gap: 10px;
+        font-size: 1.2rem;
+      }
+    }
   }
 
   & div:not(.project-heading) {
-    display: flex;
+    display: grid;
+    grid-template-columns: 50px 120px 30px;
+    justify-items: start;
+
+    & img {
+      grid-column: 1/2;
+      filter: invert(80%);
+      width: 30px;
+      height: 30px;
+      place-self: center;
+    }
 
     & button {
-      font-size: 1.2rem;
-      font-weight: bold;
-      text-align: center;
-      width: 250px;
-      height: 40px;
-
-      background-color: coral;
-      color: skyblue;
-      border: none;
+      grid-column: 2/3;
     }
 
     & span {
-      color: white;
-      background-color: grey;
+      grid-column: 3/4;
       font-size: 2rem;
-      padding: 0 10px;
+      text-align: center;
       font-weight: bold;
+      color: black;
 
       &:hover {
         cursor: pointer;
-        color: blue;
+        color: red;
       }
     }
   }

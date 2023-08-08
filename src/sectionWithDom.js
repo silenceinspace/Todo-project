@@ -8,10 +8,11 @@ import {
   displayForTasks,
   createTaskInsideProject,
   createTaskButton,
-  createProjectButton,
+  createProjectSpan,
   newProjectInput,
   backdropElement,
   cancelButton,
+  currentListName,
   // Import functions
   appendElement,
   createBlocksToRepresentTasks,
@@ -45,7 +46,7 @@ createEventListener(projectBlock, "click", displayTasksInThisProject);
 createEventListener(inboxBlock, "click", displayTasksInThisProject);
 createEventListener(createTaskInsideProject, "click", openPopup);
 createEventListener(createTaskButton, "click", openPopup);
-createEventListener(createProjectButton, "click", toggleNewProjectInputBlock);
+createEventListener(createProjectSpan, "click", toggleNewProjectInputBlock);
 createEventListener(cancelButton, "click", toggleNewProjectInputBlock);
 createEventListener(newProjectInput, "keydown", disableEnterKeyOnInput);
 
@@ -185,10 +186,11 @@ function grabProjectTitle(e) {
 
 function displayTasksInThisProject(e) {
   // Click occurs on the inside of a button
-  const btn = findClick(e, "button");
+  const btn = findClick(e, "button.project");
   if (!btn) return;
 
   const title = grabProjectTitle(e);
+  showProjectNameAboveTasks(title);
   highlightProject(title);
   generateListOfTasks(title);
 }
@@ -208,7 +210,8 @@ function findClick(e, value) {
 }
 
 function findChosenProject() {
-  const title = document.querySelector("button[disabled]").textContent;
+  const title = document.querySelector("button.project[disabled]").textContent;
+  console.log(title);
   return title;
 }
 
@@ -242,6 +245,7 @@ function getIdOfSpecificTask(task) {
 
 function updateTodoDisplay() {
   const projectTitle = findChosenProject();
+  showProjectNameAboveTasks(projectTitle);
   generateListOfTasks(projectTitle);
 }
 
@@ -288,6 +292,10 @@ function hideExpandedDetails(button) {
   });
 
   button.classList.remove("expanded");
-  const editButton = button.parentNode.querySelector(".edit-task");
+  const editButton = button.parentNode.querySelector(".edit-title-btn");
   editButton.remove();
+}
+
+function showProjectNameAboveTasks(value) {
+  currentListName.textContent = value;
 }

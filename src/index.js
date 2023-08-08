@@ -222,7 +222,9 @@ function modifyExternalArray(projectName) {
 
 function removeProject(e) {
   const span = DOMMethods.findClick(e, "span");
+  const createProjectSpan = DOMMethods.findClick(e, ".create-projects-span");
   if (!span) return;
+  if (createProjectSpan) return;
 
   const project = DOMMethods.getSiblingElementText(span);
   const removalIsConfirmed = confirmChoice();

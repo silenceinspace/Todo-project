@@ -3,6 +3,11 @@ import {
   createObjectFromDateInput,
   getMonthDayYearFormat,
 } from "./todosManipulations";
+// Import svg elements
+import inboxIcon from "./svg/inbox.svg";
+import todayIcon from "./svg/today.svg";
+import upcomingIcon from "./svg/upcoming.svg";
+import projectIcon from "./svg/folder.svg";
 
 export {
   // Export variables
@@ -10,10 +15,11 @@ export {
   inboxBlock,
   projectBlock,
   displayForTasks,
+  currentListName,
   formForCreatingTodo, // for index js
   createTaskInsideProject,
   createTaskButton,
-  createProjectButton,
+  createProjectSpan,
   newProjectInput,
   backdropElement,
   acceptButton,
@@ -34,23 +40,22 @@ const content = document.querySelector("#content");
 ////////////////////////////
 // Create DOM ELEMENTS //
 ////////////////////////////
+const appTitleDiv = createDOMElement("div", "app-title-div", "");
+const appTitleText = createDOMElement("h1", "app-title-text", "TODO");
 const inboxBlock = createDOMElement("div", "inbox-div", "");
 const projectBlock = createDOMElement("div", "project-div", "");
-const projectHeading = createDOMElement("div", "project-heading", "PROJECTS:");
-const today = createDOMElement("button", "today", "today");
+const projectHeading = createDOMElement("div", "project-heading", "PROJECTS");
 const todoBlock = createDOMElement("div", "todo-div", "");
+const currentListName = createDOMElement("div", "current-list-name", "inbox");
 const inbox = createDOMElement("button", "inbox", "inbox");
+const today = createDOMElement("button", "today", "today");
 const upcoming = createDOMElement("button", "upcoming", "upcoming");
 const createTaskButton = createDOMElement(
   "button",
   "create-tasks-btn",
-  "Create task"
+  "Add globally"
 );
-const createProjectButton = createDOMElement(
-  "button",
-  "create-projects-btn",
-  "Create project"
-);
+const createProjectSpan = createDOMElement("span", "create-projects-span", "+");
 const displayForTasks = createDOMElement("div", "display-for-tasks", "");
 const createTaskInsideProject = createDOMElement(
   "button",
@@ -92,10 +97,16 @@ const closePopupMenuButton = createDOMElement(
   "close-popup",
   "Cancel"
 );
+const inboxSVG = createImageElement(inboxIcon, "inbox-svg");
+const todaySVG = createImageElement(todayIcon, "today-svg");
+const upcomingSVG = createImageElement(upcomingIcon, "upcoming-svg");
 
 ////////////////////////////
 // Append DOM ELEMENTS //
 ////////////////////////////
+appendElement(content, appTitleDiv);
+appendElement(appTitleDiv, appTitleText);
+appendElement(appTitleDiv, createTaskButton);
 appendElement(content, inboxBlock);
 appendElement(content, projectBlock);
 appendElement(content, todoBlock);
@@ -103,13 +114,16 @@ appendElement(projectBlock, projectHeading);
 appendElement(inboxBlock, inbox);
 appendElement(inboxBlock, today);
 appendElement(inboxBlock, upcoming);
-appendElement(todoBlock, createTaskButton);
-appendElement(todoBlock, createProjectButton);
+appendElement(inboxBlock, inboxSVG);
+appendElement(inboxBlock, todaySVG);
+appendElement(inboxBlock, upcomingSVG);
+appendElement(projectHeading, createProjectSpan);
+appendElement(todoBlock, currentListName);
 appendElement(todoBlock, displayForTasks);
 appendElement(todoBlock, createTaskInsideProject);
 appendElement(document.body, backdropElement);
 appendElement(backdropElement, formForCreatingTodo);
-appendElement(todoBlock, formForCreatingProject);
+appendElement(projectHeading, formForCreatingProject);
 appendElement(formForCreatingProject, projectFormParagraph);
 appendElement(projectFormParagraph, newProjectInput);
 appendElement(projectFormParagraph, cancelButton);
@@ -249,7 +263,11 @@ function createBlocksInExpandedState(storageArray, button, id, task) {
       // Catch title and due date paragraphs to add a pseudo element to them
       const titlePara = task.querySelector(".task-title");
       const dueDatePara = task.querySelector(".task-due-date");
-      const editTitle = createDOMElement("button", "edit-title-btn", "Edit title");
+      const editTitle = createDOMElement(
+        "button",
+        "edit-title-btn",
+        "Edit title"
+      );
 
       createExpandedTextFields(
         task,
@@ -298,9 +316,11 @@ function createExpandedTextFields(
 
 function displayNewProject(value) {
   const div = createDOMElement("div", "project-title-div", "");
+  const img = createImageElement(projectIcon, "project-svg");
   const btn = createDOMElement("button", "custom-project", value);
   addClass(btn, "project");
   const span = createDOMElement("span", "remove-project-btn", "X");
+  appendElement(div, img);
   appendElement(div, btn);
   appendElement(div, span);
   appendElement(projectBlock, div);
@@ -354,4 +374,11 @@ function addAttribute(element, attributeName, attributeValue) {
 
 function addClass(element, className) {
   element.classList.add(className);
+}
+
+function createImageElement(imageURL, className) {
+  const image = document.createElement("img");
+  addClass(image, className);
+  addAttribute(image, "src", imageURL);
+  return image;
 }
