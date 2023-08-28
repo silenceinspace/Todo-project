@@ -26,6 +26,74 @@ let projectStorage = [];
 console.log("Project storage:");
 console.log(projectStorage);
 
+// Local Storage
+(function checkLocalStorage() {
+  if (localStorage.length === 0) {
+    console.log("local storage is empty");
+    return;
+  }
+
+  if (
+    localStorage.getItem("todoArray") &&
+    JSON.parse(localStorage.getItem("todoArray")).length !== 0
+  ) {
+    recreateTodoClassObjects(JSON.parse(localStorage.getItem("todoArray")));
+  } else {
+    localStorage.removeItem("todoArray");
+  }
+
+  if (
+    localStorage.getItem("projectArray") &&
+    JSON.parse(localStorage.getItem("projectArray")).length !== 0
+  ) {
+    recreateProjectClassObjects(
+      JSON.parse(localStorage.getItem("projectArray"))
+    );
+  } else {
+    localStorage.removeItem("projectArray");
+  }
+})();
+
+function recreateTodoClassObjects(array) {
+  for (let i = 0; i < array.length; i++) {
+    const project = array[i].projectTitle;
+    const title = array[i].title;
+    const description = array[i].description;
+    const dueDate = array[i].dueDate;
+    const priority = array[i].priority;
+
+    // BI create Todo objects anew because Todos objects (class function) cannot be stored in JSON format
+    const task = new Todo(project, title, description, dueDate, priority);
+    mainStorage = taskInterface.add(task);
+    console.log(mainStorage);
+    DOMMethods.updateTodoDisplay();
+  }
+  // Clear and store again to keep ids relevant
+  localStorage.removeItem("todoArray");
+  populateStorage("todos");
+}
+
+function recreateProjectClassObjects(array) {
+  for (let i = 0; i < array.length; i++) {
+    const title = array[i].projectTitle;
+    const project = new Project(title);
+    projectStorage = projectInterface.add(project);
+    console.log(projectStorage);
+    displayNewProject(title);
+  }
+}
+
+function populateStorage(data) {
+  if (data === "todos") {
+    localStorage.setItem("todoArray", JSON.stringify(taskInterface.todos));
+  } else if (data === "projects") {
+    localStorage.setItem(
+      "projectArray",
+      JSON.stringify(projectInterface.projects)
+    );
+  }
+}
+
 // Cancel/add todo (event delegation)
 DOMMethods.createEventListener(formForCreatingTodo, "click", controlPopupView);
 
@@ -125,6 +193,7 @@ function createTodo() {
   }
   // Dynamically render newly created tasks
   DOMMethods.updateTodoDisplay();
+  populateStorage("todos");
 }
 
 function controlPopupView(e) {
@@ -157,6 +226,7 @@ function removeTask(e) {
   task.remove();
   mainStorage = taskInterface.remove(id);
   console.log(mainStorage);
+  populateStorage("todos");
 }
 
 // Complete a task
@@ -166,6 +236,7 @@ function slowDownTaskCompleting(blockWithTaskInfo, idParagraph) {
     blockWithTaskInfo.remove();
     mainStorage = taskInterface.remove(idParagraph);
     console.log(mainStorage);
+    populateStorage("todos");
   }, 300);
 }
 
@@ -203,6 +274,7 @@ function createProject() {
   DOMMethods.highlightProject(title);
   DOMMethods.updateTodoDisplay();
   console.log(projectStorage);
+  populateStorage("projects");
 }
 
 // Remove a project
@@ -218,13 +290,12 @@ function modifyExternalArray(projectName) {
     taskInterface.todos
   );
   mainStorage = taskInterface.todos;
+  populateStorage("todos");
 }
 
 function removeProject(e) {
-  const span = DOMMethods.findClick(e, "span");
-  const createProjectSpan = DOMMethods.findClick(e, ".create-projects-span");
+  const span = DOMMethods.findClick(e, "span.remove-project-btn");
   if (!span) return;
-  if (createProjectSpan) return;
 
   const project = DOMMethods.getSiblingElementText(span);
   const removalIsConfirmed = confirmChoice();
@@ -237,6 +308,7 @@ function removeProject(e) {
     DOMMethods.updateTodoDisplay();
     console.log(projectStorage);
     console.log(mainStorage);
+    populateStorage("projects");
   }
 }
 
@@ -270,6 +342,7 @@ function editTaskTitle(e) {
   const input = getInputForEditingTitle(currentTitle);
   mainStorage = taskInterface.editTitle(id, input);
   DOMMethods.updateTodoDisplay();
+  populateStorage("todos");
 }
 
 function getInputForEditingTitle(existingTitle) {
